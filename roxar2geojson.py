@@ -21,10 +21,21 @@ for path in args.project:
             m.update(well.name.encode('ascii'))
             digest = m.digest()
             segment_size = int(m.digest_size / 3)
-            r = int.from_bytes(digest[:segment_size], 'big') % 205 + 50
-            g = int.from_bytes(digest[segment_size:-segment_size], 'big') % 205 + 50
-            b = int.from_bytes(digest[-segment_size:], 'big') % 205 + 50
+            r = int.from_bytes(digest[:segment_size], 'big') % 255
+            g = int.from_bytes(digest[segment_size:-segment_size], 'big') % 255
+            b = int.from_bytes(digest[-segment_size:], 'big') % 255
 
+            max_intensity = max(r, g, b)
+
+            f = 255 / max_intensity
+
+            r *= f
+            g *= f
+            b *= f
+
+            r = int(r)
+            g = int(g)
+            b = int(b)
 
             feature = {
                 "type": "Feature",
