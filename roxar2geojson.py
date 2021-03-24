@@ -2,69 +2,75 @@ import argparse, sys, contextlib, os, json, hashlib
 import roxar
 import roxar.coordinate_systems
 
-parser = argparse.ArgumentParser(description='Create GeoJson well geometry.')
+def generate_color(text):
+    m = hashlib.sha256()
+    m.update(text.encode('ascii', errors='replace'))
+    digest = m.digest()
+    segment_size = int(m.digest_size / 3)
+    r = int.from_bytes(digest[:segment_size], 'big') % 255
+    g = int.from_bytes(digest[segment_size:-segment_size], 'big') % 255
+    b = int.from_bytes(digest[-segment_size:], 'big') % 255
 
-parser.add_argument('project', type=str, nargs='+', help='RMS project path')
+    max_intensity = max(r, g, b)
 
-args = parser.parse_args()
+    f = 255 / max_intensity
 
-geometry = []
+    r *= f
+    g *= f
+    b *= f
 
-# Roxar API quirk
-sys.stdout = os.fdopen(os.dup(1), 'w')
-os.close(1)
+    r = int(r)
+    g = int(g)
+    b = int(b)
 
-for path in args.project:
-    with roxar.Project.open(path, readonly=True) as project:
-        for well in project.wells:
-            m = hashlib.sha256()
-            m.update(well.name.encode('ascii', errors='replace'))
-            digest = m.digest()
-            segment_size = int(m.digest_size / 3)
-            r = int.from_bytes(digest[:segment_size], 'big') % 255
-            g = int.from_bytes(digest[segment_size:-segment_size], 'big') % 255
-            b = int.from_bytes(digest[-segment_size:], 'big') % 255
+    return [r, g, b, 255]
 
-            max_intensity = max(r, g, b)
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description='Create GeoJson well geometry.')
 
-            f = 255 / max_intensity
+    parser.add_argument('project', type=str, nargs='+', help='RMS project path')
 
-            r *= f
-            g *= f
-            b *= f
+    args = parser.parse_args()
 
-            r = int(r)
-            g = int(g)
-            b = int(b)
+    geometry = []
 
-            feature = {
-                "type": "Feature",
-                "geometry": {
-                    "type": "Point",
-                    "coordinates": well.wellhead,
-                },
-                "properties": {
-                    "name": well.name,
-                    "color": [r, g, b, 200],
-                }
-            }
+    # Roxar API quirk
+    sys.stdout = os.fdopen(os.dup(1), 'w')
+    os.close(1)
 
-            geometry.append(feature)
+    for path in args.project:
+        with roxar.Project.open(path, readonly=True) as project:
+            for well in project.wells:
+                color = generate_color(well.name)
 
-            for trajectory in well.wellbore.trajectories:
-                coordinates = trajectory.survey_point_series.get_points()
                 feature = {
                     "type": "Feature",
                     "geometry": {
-                        "type": "LineString",
-                        "coordinates": coordinates[:,:2].tolist(),  # to [[x, y], ...]
+                        "type": "Point",
+                        "coordinates": well.wellhead,
                     },
                     "properties": {
                         "name": well.name,
-                        "color": [r, g, b, 200],
+                        "color": color,
                     }
                 }
+
                 geometry.append(feature)
 
+                for trajectory in well.wellbore.trajectories:
+                    coordinates = trajectory.survey_point_series.get_points()
+                    feature = {
+                        "type": "Feature",
+                        "geometry": {
+                            "type": "LineString",
+                            "coordinates": coordinates[:,:2].tolist(),  # to [[x, y], ...]
+                        },
+                        "properties": {
+                            "name": well.name,
+                            "color": color,
+                        }
+                    }
+                    geometry.append(feature)
 
-print(json.dumps(geometry))
+
+    print(json.dumps(geometry))
