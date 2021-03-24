@@ -15,10 +15,10 @@ sys.stdout = os.fdopen(os.dup(1), 'w')
 os.close(1)
 
 for path in args.project:
-    with roxar.Project.open(path) as project:
+    with roxar.Project.open(path, readonly=True) as project:
         for well in project.wells:
             m = hashlib.sha256()
-            m.update(well.name.encode('ascii'))
+            m.update(well.name.encode('ascii', errors='replace'))
             digest = m.digest()
             segment_size = int(m.digest_size / 3)
             r = int.from_bytes(digest[:segment_size], 'big') % 255
