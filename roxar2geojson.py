@@ -34,7 +34,7 @@ if __name__ == "__main__":
 
     geometry = []
 
-    # Roxar API quirk
+    # Prevent Roxar API warnings to stdout
     sys.stdout = os.fdopen(os.dup(1), 'w')
     os.close(1)
 
