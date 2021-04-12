@@ -1,3 +1,5 @@
+#!python3
+
 import argparse, sys, contextlib, os, json, hashlib
 import geojson
 import roxar_proxy as roxar
@@ -38,8 +40,30 @@ def get_well_geojson(well):
         geometry.append(feature)
     return geometry
 
+def get_wells_geojson(project):
+    geometry = []
+    for well in project.wells:
+        geometry += get_well_geojson(well)
+    return geometry
+
+def get_stratigraphy_json(project):
+    stratigraphy = {'zones': [], 'horizons': []}
+    zones = project.zones
+    horizons = project.horizons
+    for zone in zones:
+        info = {
+                'name': zone.name,
+                'horizon_above': zone.horizon_above.name,
+                'horizon_below': zone.horizon_below.name
+        }
+        stratigraphy['zones'].append(info)
+    for horizon in horizons:
+        stratigraphy['horizons'].append(horizon.name)
+    return stratigraphy
+
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description='Create GeoJson well geometry.')
+    parser = argparse.ArgumentParser(
+            description='Create Json data from RMS project.')
 
     parser.add_argument('project', type=str, nargs='+', help='RMS project path')
 
@@ -47,13 +71,18 @@ if __name__ == "__main__":
 
     geometry = []
 
-    # Prevent Roxar API warnings to stdout
+    # Suppress Roxar API warnings to stdout
     sys.stdout = os.fdopen(os.dup(1), 'w')
     os.close(1)
 
     for path in args.project:
-        with roxar.Project.open(path, readonly=True) as project:
-            for well in project.wells:
-                geometry += get_well_geojson(well)
+        try:
+            with roxar.Project.open(path, readonly=True) as project:
+                if parser.prog == "wells2geojson":
+                    geometry.extend(get_wells_geojson(project))
+                elif parser.prog == "stratigraphy2json":
+                    geometry.append(get_stratigraphy_json(project))
+        except NotImplementedError:
+            print("Error: Roxar API needed.", file=sys.stderr)
 
     print(json.dumps(geometry))

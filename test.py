@@ -58,6 +58,32 @@ class TestWellGeoJson(unittest.TestCase):
             ]
         )
 
+class TestStratigraphyJson(unittest.TestCase):
+    def test_none(self):
+        with self.assertRaises(AttributeError):
+            roxar2json.get_stratigraphy_json(None)
+
+    def test_stratigraphy(self):
+        project = roxar_proxy.Project()
+        zones = project.zones
+        horizons = project.horizons
+        top = horizons.create("TopHorizon", roxar_proxy.HorizonType.calculated)
+        bottom = horizons.create(
+                "BottomHorizon", roxar_proxy.HorizonType.calculated)
+        zone = zones.create("TestZone", top, bottom)
+        stratigraphy = roxar2json.get_stratigraphy_json(project)
+        self.assertEqual(
+                stratigraphy,
+                {
+                    'zones': [{
+                        'name': 'TestZone',
+                        'horizon_above': 'TopHorizon',
+                        'horizon_below': 'BottomHorizon',
+                    }],
+                    'horizons': ['TopHorizon', 'BottomHorizon'],
+                }
+        )
+
 if __name__ == '__main__':
     result = unittest.main(exit=False, verbosity=1)
     sys.exit(not result.result.wasSuccessful())
