@@ -1,6 +1,6 @@
 import argparse, sys, contextlib, os, json, hashlib
-import roxar
-import roxar.coordinate_systems
+import geojson
+import roxar_proxy as roxar
 
 def generate_color(text):
     m = hashlib.sha256()
@@ -25,6 +25,19 @@ def generate_color(text):
 
     return [r, g, b, 255]
 
+def get_well_geojson(well):
+    geometry = []
+    color = generate_color(well.name)
+    feature = geojson.create_point(well.wellhead, well.name, color)
+    geometry.append(feature)
+
+    for trajectory in well.wellbore.trajectories:
+        coordinates = trajectory.survey_point_series.get_points()
+        feature = geojson.create_polyline(
+                coordinates[:,:2].tolist(), well.name, color)
+        geometry.append(feature)
+    return geometry
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Create GeoJson well geometry.')
 
@@ -41,36 +54,6 @@ if __name__ == "__main__":
     for path in args.project:
         with roxar.Project.open(path, readonly=True) as project:
             for well in project.wells:
-                color = generate_color(well.name)
-
-                feature = {
-                    "type": "Feature",
-                    "geometry": {
-                        "type": "Point",
-                        "coordinates": well.wellhead,
-                    },
-                    "properties": {
-                        "name": well.name,
-                        "color": color,
-                    }
-                }
-
-                geometry.append(feature)
-
-                for trajectory in well.wellbore.trajectories:
-                    coordinates = trajectory.survey_point_series.get_points()
-                    feature = {
-                        "type": "Feature",
-                        "geometry": {
-                            "type": "LineString",
-                            "coordinates": coordinates[:,:2].tolist(),  # to [[x, y], ...]
-                        },
-                        "properties": {
-                            "name": well.name,
-                            "color": color,
-                        }
-                    }
-                    geometry.append(feature)
-
+                geometry += get_well_geojson(well)
 
     print(json.dumps(geometry))
