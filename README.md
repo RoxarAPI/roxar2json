@@ -1,3 +1,4 @@
+# Roxar2json
 Serializes wells and stratigraphy info from RMS projects to Json encoding.
 
 ## Usage
@@ -8,11 +9,11 @@ Synopsis:
 
 Extract wells geometry:
 ```sh
-wells2json <RMS project path>```
+roxenv python wells2json <RMS project path>```
 
 Extract stratigraphy:
 ```sh
-stratigraphy2json <RMS project path>```
+roxenv python stratigraphy2json <RMS project path>```
 
 ```python
 import roxar2json
