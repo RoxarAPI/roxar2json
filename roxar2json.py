@@ -66,6 +66,8 @@ if __name__ == "__main__":
             description='Create Json data from RMS project.')
 
     parser.add_argument('project', type=str, nargs='+', help='RMS project path')
+    parser.add_argument(
+            '-p', '--pretty', action="store_true", help='RMS project path')
 
     args = parser.parse_args()
 
@@ -85,4 +87,8 @@ if __name__ == "__main__":
         except NotImplementedError:
             print("Error: Roxar API needed.", file=sys.stderr)
 
-    print(json.dumps(geometry))
+    indent = None
+    if args.pretty:
+        indent = 4
+
+    print(json.dumps(geometry, indent=indent))
