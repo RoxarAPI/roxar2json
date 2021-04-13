@@ -1,16 +1,16 @@
 "Conditinal mock Roxar API for unit tests."
 
-class MockWellBore(object):
+class MockWellBore:
     "Mock Roxar API WellBore."
     trajectories = ()
 
-class MockWell(object):
+class MockWell:
     "Mock Roxar API Well."
     name = None
     wellhead = None
     wellbore = MockWellBore()
 
-class MockFeature(object):
+class MockFeature:
     "Mock Roxar API geological feature."
     def __init__(self, name):
         self.name = name
@@ -27,6 +27,7 @@ class MockHorizonContainer(list):
 
     def create(self, name, horizon_type):
         "Create mock horizon."
+        assert horizon_type is not None
         horizon = MockFeature(name)
         self.append(horizon)
         return horizon
@@ -39,18 +40,18 @@ class MockZoneContainer(list):
         self.append(zone)
         return zone
 
-class MockProject(object):
+class MockProject:
     "Mock Roxar API project."
     zones = MockZoneContainer()
     horizons = MockHorizonContainer()
 
-    def open(*args, **kwargs):
+    def open(self, *args, **kwargs):
         "Not implemented."
         raise NotImplementedError("Not supported.")
 
-class MockHorizonType(object):
+class MockHorizonType:
     "Mock Roxar API HorizonType."
-    calculated = None
+    calculated = True
 
 def conditional_well_type():
     "Conditionally get well type."

@@ -1,7 +1,10 @@
 "Roxar 2 json unit tests."
 
-import unittest, sys
-import roxar2json, geojson, roxar_proxy
+import unittest
+import sys
+import roxar2json
+import geojson
+import roxar_proxy
 
 class TestGenerateColor(unittest.TestCase):
     def test_none(self):

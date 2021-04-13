@@ -1,31 +1,35 @@
 #!python3
 
-import argparse, sys, contextlib, os, json, hashlib
+import argparse
+import sys
+import os
+import json
+import hashlib
 import geojson
 import roxar_proxy as roxar
 
 def generate_color(text):
-    m = hashlib.sha256()
-    m.update(text.encode('ascii', errors='replace'))
-    digest = m.digest()
-    segment_size = int(m.digest_size / 3)
-    r = int.from_bytes(digest[:segment_size], 'big') % 255
-    g = int.from_bytes(digest[segment_size:-segment_size], 'big') % 255
-    b = int.from_bytes(digest[-segment_size:], 'big') % 255
+    hash_object = hashlib.sha256()
+    hash_object.update(text.encode('ascii', errors='replace'))
+    digest = hash_object.digest()
+    segment_size = int(hash_object.digest_size / 3)
+    red = int.from_bytes(digest[:segment_size], 'big') % 255
+    green = int.from_bytes(digest[segment_size:-segment_size], 'big') % 255
+    blue = int.from_bytes(digest[-segment_size:], 'big') % 255
 
-    max_intensity = max(r, g, b)
+    max_intensity = max(red, green, blue)
 
-    f = 255 / max_intensity
+    frac = 255 / max_intensity
 
-    r *= f
-    g *= f
-    b *= f
+    red *= frac
+    green *= frac
+    blue *= frac
 
-    r = int(r)
-    g = int(g)
-    b = int(b)
+    red = int(red)
+    green = int(green)
+    blue = int(blue)
 
-    return [r, g, b, 255]
+    return [red, green, blue, 255]
 
 def get_well_geojson(well):
     geometry = []
@@ -36,7 +40,7 @@ def get_well_geojson(well):
     for trajectory in well.wellbore.trajectories:
         coordinates = trajectory.survey_point_series.get_points()
         feature = geojson.create_polyline(
-                coordinates[:,:2].tolist(), well.name, color)
+            coordinates[:, :2].tolist(), well.name, color)
         geometry.append(feature)
     return geometry
 
@@ -52,9 +56,9 @@ def get_stratigraphy_json(project):
     horizons = project.horizons
     for zone in zones:
         info = {
-                'name': zone.name,
-                'horizon_above': zone.horizon_above.name,
-                'horizon_below': zone.horizon_below.name
+            'name': zone.name,
+            'horizon_above': zone.horizon_above.name,
+            'horizon_below': zone.horizon_below.name
         }
         stratigraphy['zones'].append(info)
     for horizon in horizons:
@@ -62,36 +66,37 @@ def get_stratigraphy_json(project):
     return stratigraphy
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(
-            description='Create Json data from RMS project.')
+    PARSER = argparse.ArgumentParser(
+        description='Create Json data from RMS project.')
 
-    parser.add_argument('project', type=str, nargs='+', help='RMS project path')
-    parser.add_argument(
-            '-p',
-            '--pretty',
-            action="store_true",
-            help='Encode with indentation')
+    PARSER.add_argument('project', type=str, nargs='+', help='RMS project path')
+    PARSER.add_argument(
+        '-p',
+        '--pretty',
+        action="store_true",
+        help='Encode with indentation')
 
-    args = parser.parse_args()
+    ARGS = PARSER.parse_args()
 
-    data = []
+    DATA = []
 
     # Suppress Roxar API warnings to stdout
     sys.stdout = os.fdopen(os.dup(1), 'w')
     os.close(1)
 
-    for path in args.project:
+    for path in ARGS.project:
         try:
-            with roxar.Project.open(path, readonly=True) as project:
-                if parser.prog == "wells2geojson":
-                    data.extend(get_wells_geojson(project))
-                elif parser.prog == "stratigraphy2json":
-                    data.append(get_stratigraphy_json(project))
+            with roxar.Project.open(path, readonly=True) as roxar_project:
+                if PARSER.prog == "wells2geojson":
+                    DATA.extend(get_wells_geojson(roxar_project))
+                elif PARSER.prog == "stratigraphy2json":
+                    DATA.append(get_stratigraphy_json(roxar_project))
         except NotImplementedError:
             print("Error: Roxar API needed.", file=sys.stderr)
 
-    indent = None
-    if args.pretty:
-        indent = 4
+    INDENT = None
+    if ARGS.pretty:
+        INDENT = 4
 
-    print(json.dumps(data, indent=indent))
+
+    print(json.dumps(DATA, indent=INDENT))
