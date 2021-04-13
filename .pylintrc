@@ -5,4 +5,5 @@ disable =
     too-few-public-methods,
     import-error,
     protected-access,
-    invalid-name
+    invalid-name,
+    import-outside-toplevel
