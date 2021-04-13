@@ -47,7 +47,7 @@ def get_wells_geojson(project):
     return geometry
 
 def get_stratigraphy_json(project):
-    stratigraphy = {'zones': [], 'horizons': []}
+    stratigraphy = {'horizons': [], 'zones': []}
     zones = project.zones
     horizons = project.horizons
     for zone in zones:

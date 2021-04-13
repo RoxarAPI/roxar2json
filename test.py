@@ -75,12 +75,12 @@ class TestStratigraphyJson(unittest.TestCase):
         self.assertEqual(
                 stratigraphy,
                 {
+                    'horizons': ['TopHorizon', 'BottomHorizon'],
                     'zones': [{
                         'name': 'TestZone',
                         'horizon_above': 'TopHorizon',
                         'horizon_below': 'BottomHorizon',
                     }],
-                    'horizons': ['TopHorizon', 'BottomHorizon'],
                 }
         )
 
