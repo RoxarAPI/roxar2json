@@ -19,3 +19,7 @@ roxenv python stratigraphy2json <RMS project path>```
 import roxar2json
 with roxar.Project.open(project_path) as project:
     stratigraphy = roxar2json.get_stratigraphy_json(project)```
+
+## Testing
+```python
+roxenv python test.py```
