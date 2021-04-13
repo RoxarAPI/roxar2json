@@ -10,7 +10,7 @@ Synopsis:
 
 Extract wells geometry:
 ```sh
-roxenv python wells2json <RMS project path>
+roxenv python wells2geojson <RMS project path>
 ```
 
 Extract stratigraphy:
@@ -22,6 +22,7 @@ roxenv python stratigraphy2json <RMS project path>
 import roxar2json
 with roxar.Project.open(project_path) as project:
     stratigraphy = roxar2json.get_stratigraphy_json(project)
+    wells = roxar2json.get_wells_geojson(project)
 ```
 
 ## Testing
