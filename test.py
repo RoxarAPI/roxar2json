@@ -1,10 +1,12 @@
+"Roxar 2 json unit tests."
+
 import unittest, sys
 import roxar2json, geojson, roxar_proxy
 
 class TestGenerateColor(unittest.TestCase):
     def test_none(self):
         with self.assertRaises(AttributeError):
-            rgba = roxar2json.generate_color(None)
+            roxar2json.generate_color(None)
 
     def test_empty(self):
         rgba = roxar2json.generate_color("")
@@ -14,24 +16,24 @@ class TestGeoJsonPoint(unittest.TestCase):
     def test_none(self):
         feature = geojson.create_point(None, None, None)
         self.assertEqual(
-                feature,
-                {
-                    'type': 'Feature',
-                    'geometry': {'type': 'Point', 'coordinates': None},
-                    'properties': {'name': None, 'color': None}
-                }
+            feature,
+            {
+                'type': 'Feature',
+                'geometry': {'type': 'Point', 'coordinates': None},
+                'properties': {'name': None, 'color': None}
+            }
         )
 
 class TestGeoJsonPolyline(unittest.TestCase):
     def test_none(self):
         feature = geojson.create_polyline(None, None, None)
         self.assertEqual(
-                feature,
-                {
-                    'type': 'Feature',
-                    'geometry': {'type': 'LineString', 'coordinates': None},
-                    'properties': {'name': None, 'color': None}
-                }
+            feature,
+            {
+                'type': 'Feature',
+                'geometry': {'type': 'LineString', 'coordinates': None},
+                'properties': {'name': None, 'color': None}
+            }
         )
 
 
@@ -67,21 +69,22 @@ class TestStratigraphyJson(unittest.TestCase):
         project = roxar_proxy.Project()
         zones = project.zones
         horizons = project.horizons
-        top = horizons.create("TopHorizon", roxar_proxy.HorizonType.calculated)
+        top = horizons.create(
+            "TopHorizon", roxar_proxy.HorizonType.calculated)
         bottom = horizons.create(
-                "BottomHorizon", roxar_proxy.HorizonType.calculated)
-        zone = zones.create("TestZone", top, bottom)
+            "BottomHorizon", roxar_proxy.HorizonType.calculated)
+        zones.create("TestZone", top, bottom)
         stratigraphy = roxar2json.get_stratigraphy_json(project)
         self.assertEqual(
-                stratigraphy,
-                {
-                    'horizons': ['TopHorizon', 'BottomHorizon'],
-                    'zones': [{
-                        'name': 'TestZone',
-                        'horizon_above': 'TopHorizon',
-                        'horizon_below': 'BottomHorizon',
-                    }],
-                }
+            stratigraphy,
+            {
+                'horizons': ['TopHorizon', 'BottomHorizon'],
+                'zones': [{
+                    'name': 'TestZone',
+                    'horizon_above': 'TopHorizon',
+                    'horizon_below': 'BottomHorizon',
+                }],
+            }
         )
 
 if __name__ == '__main__':

@@ -1,4 +1,7 @@
+"GeoJson geometry functions."
+
 def create_point(coordinates, name, color):
+    "Create GeoJson point."
     feature = {
         "type": "Feature",
         "geometry": {
@@ -13,6 +16,7 @@ def create_point(coordinates, name, color):
     return feature
 
 def create_polyline(coordinates, name, color):
+    "Create GeoJson LineString."
     feature = {
         "type": "Feature",
         "geometry": {
@@ -25,4 +29,3 @@ def create_polyline(coordinates, name, color):
         }
     }
     return feature
-

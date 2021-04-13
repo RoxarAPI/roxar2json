@@ -1,77 +1,98 @@
-class MockWellBore:
+"Conditinal mock Roxar API for unit tests."
+
+class MockWellBore(object):
+    "Mock Roxar API WellBore."
     trajectories = ()
 
-class MockWell:
+class MockWell(object):
+    "Mock Roxar API Well."
     name = None
     wellhead = None
     wellbore = MockWellBore()
 
-class MockFeature:
+class MockFeature(object):
+    "Mock Roxar API geological feature."
     def __init__(self, name):
         self.name = name
 
 class MockZone(MockFeature):
+    "Mock Roxar API Zone."
     def __init__(self, name, horizon_above, horizon_below):
         MockFeature.__init__(self, name)
         self.horizon_above = horizon_above
         self.horizon_below = horizon_below
 
 class MockHorizonContainer(list):
+    "Mock Roxar API horizon container."
+
     def create(self, name, horizon_type):
+        "Create mock horizon."
         horizon = MockFeature(name)
         self.append(horizon)
         return horizon
 
 class MockZoneContainer(list):
+    "Mock Roxar API zone container."
     def create(self, name, horizon_above, horizon_below):
+        "Create mock zone."
         zone = MockZone(name, horizon_above, horizon_below)
         self.append(zone)
         return zone
 
-class MockProject:
+class MockProject(object):
+    "Mock Roxar API project."
     zones = MockZoneContainer()
     horizons = MockHorizonContainer()
 
     def open(*args, **kwargs):
+        "Not implemented."
         raise NotImplementedError("Not supported.")
 
-class MockHorizonType:
+class MockHorizonType(object):
+    "Mock Roxar API HorizonType."
     calculated = None
 
 def conditional_well_type():
+    "Conditionally get well type."
+
     try:
         import roxar
         import roxar.wells
 
-        class Well(roxar.wells.Well):
+        class RoxarWell(roxar.wells.Well):
+            "Roxar API well wrapper."
             name = None
             wellhead = None
             wellbore = MockWellBore()
             def __init__(self):
                 pass
 
-        return Well
+        return RoxarWell
 
     except ModuleNotFoundError:
         return MockWell
 
 def conditional_project_type():
+    "Conditionally get project type."
     try:
         import roxar
         import roxar._testing
 
-        class Project(roxar.Project):
+        class RoxarProject(roxar.Project):
+            "Roxar API project wrapper."
             def __new__(cls):
                 project = roxar._testing.create_example(
-                        roxar._testing.Example.none)
+                    roxar._testing.Example.none)
                 return project
 
-        return Project
+        return RoxarProject
 
     except ModuleNotFoundError:
         return MockProject
 
 def conditional_horizon_type_type():
+    "Conditionally get HorizonType type."
+
     try:
         import roxar
         return roxar.HorizonType
