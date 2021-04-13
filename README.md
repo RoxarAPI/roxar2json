@@ -1,0 +1,20 @@
+Serializes wells and stratigraphy info from RMS projects to Json encoding.
+
+## Usage
+Synopsis:
+```sh
+./wells2geojson -h
+./stratigraphy2json -h```
+
+Extract wells geometry:
+```sh
+wells2json <RMS project path>```
+
+Extract stratigraphy:
+```sh
+stratigraphy2json <RMS project path>```
+
+```python
+import roxar2json
+with roxar.Project.open(project_path) as project:
+    stratigraphy = roxar2json.get_stratigraphy_json(project)```

@@ -67,11 +67,14 @@ if __name__ == "__main__":
 
     parser.add_argument('project', type=str, nargs='+', help='RMS project path')
     parser.add_argument(
-            '-p', '--pretty', action="store_true", help='RMS project path')
+            '-p',
+            '--pretty',
+            action="store_true",
+            help='Encode with indentation')
 
     args = parser.parse_args()
 
-    geometry = []
+    data = []
 
     # Suppress Roxar API warnings to stdout
     sys.stdout = os.fdopen(os.dup(1), 'w')
@@ -81,9 +84,9 @@ if __name__ == "__main__":
         try:
             with roxar.Project.open(path, readonly=True) as project:
                 if parser.prog == "wells2geojson":
-                    geometry.extend(get_wells_geojson(project))
+                    data.extend(get_wells_geojson(project))
                 elif parser.prog == "stratigraphy2json":
-                    geometry.append(get_stratigraphy_json(project))
+                    data.append(get_stratigraphy_json(project))
         except NotImplementedError:
             print("Error: Roxar API needed.", file=sys.stderr)
 
@@ -91,4 +94,4 @@ if __name__ == "__main__":
     if args.pretty:
         indent = 4
 
-    print(json.dumps(geometry, indent=indent))
+    print(json.dumps(data, indent=indent))
