@@ -20,6 +20,6 @@ setuptools.setup(
         "License :: OSI Approved :: Mozilla Public License 2.0 (MPL 2.0)",
         "Operating System :: OS Independent",
     ],
-    packages = ["roxar2json"],
+    packages=["roxar2json"],
     python_requires=">=3.7",
 )
