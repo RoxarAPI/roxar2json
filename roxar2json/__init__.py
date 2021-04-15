@@ -5,8 +5,8 @@ import sys
 import os
 import json
 import hashlib
-import geojson
-import roxar_proxy as roxar
+from . import geojson
+from . import roxar_proxy as roxar
 
 def generate_color(text):
     hash_object = hashlib.sha256()
