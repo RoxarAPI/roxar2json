@@ -6,6 +6,7 @@ import os
 import json
 import hashlib
 from . import geojson
+from . import jsonwelllog
 from . import roxar_proxy as roxar
 
 def generate_color(text):
@@ -50,6 +51,21 @@ def get_wells_geojson(project):
         geometry += get_well_geojson(well)
     return geometry
 
+def get_log_jsonwelllog(log_run):
+    log = {}
+    log['header'] = jsonwelllog.create_header(log_run)
+    log['curves'] = jsonwelllog.create_curves(log_run)
+    log['data'] = jsonwelllog.create_data(log_run)
+    return log
+
+def get_logs_jsonwelllog(project):
+    logs = []
+    for well in project.wells:
+        for trajectory in well.wellbore.trajectories:
+            for log_run in trajectory.log_runs:
+                logs.append(get_log_jsonwelllog(log_run))
+    return logs
+
 def get_stratigraphy_json(project):
     stratigraphy = {'horizons': [], 'zones': []}
     zones = project.zones
@@ -89,6 +105,8 @@ if __name__ == "__main__":
             with roxar.Project.open(path, readonly=True) as roxar_project:
                 if PARSER.prog == "wells2geojson":
                     DATA.extend(get_wells_geojson(roxar_project))
+                elif PARSER.prog == "logs2jsonwelllog":
+                    DATA.extend(get_logs_jsonwelllog(roxar_project))
                 elif PARSER.prog == "stratigraphy2json":
                     DATA.append(get_stratigraphy_json(roxar_project))
         except NotImplementedError:
