@@ -1,12 +1,5 @@
-#!python3
-
-import argparse
-import sys
-import os
-import json
 import hashlib
 from . import geojson
-from . import roxar_proxy as roxar
 
 def generate_color(text):
     hash_object = hashlib.sha256()
@@ -34,20 +27,21 @@ def generate_color(text):
 def get_well_geojson(well):
     geometry = []
     color = generate_color(well.name)
-    feature = geojson.create_point(well.wellhead, well.name, color)
+    feature = geojson.create_point(well.wellhead)
     geometry.append(feature)
 
     for trajectory in well.wellbore.trajectories:
         coordinates = trajectory.survey_point_series.get_points()
-        feature = geojson.create_polyline(
-            coordinates[:, :2].tolist(), well.name, color)
+        feature = geojson.create_polyline(coordinates[:, :2].tolist())
         geometry.append(feature)
-    return geometry
+
+    geometry_collection = geojson.create_collection(geometry)
+    return geojson.create_feature(geometry_collection, well.name, color)
 
 def get_wells_geojson(project):
     geometry = []
     for well in project.wells:
-        geometry += get_well_geojson(well)
+        geometry.append(get_well_geojson(well))
     return geometry
 
 def get_stratigraphy_json(project):
@@ -64,39 +58,3 @@ def get_stratigraphy_json(project):
     for horizon in horizons:
         stratigraphy['horizons'].append(horizon.name)
     return stratigraphy
-
-if __name__ == "__main__":
-    PARSER = argparse.ArgumentParser(
-        description='Create Json data from RMS project.')
-
-    PARSER.add_argument('project', type=str, nargs='+', help='RMS project path')
-    PARSER.add_argument(
-        '-p',
-        '--pretty',
-        action="store_true",
-        help='Encode with indentation')
-
-    ARGS = PARSER.parse_args()
-
-    DATA = []
-
-    # Suppress Roxar API warnings to stdout
-    sys.stdout = os.fdopen(os.dup(1), 'w')
-    os.close(1)
-
-    for path in ARGS.project:
-        try:
-            with roxar.Project.open(path, readonly=True) as roxar_project:
-                if PARSER.prog == "wells2geojson":
-                    DATA.extend(get_wells_geojson(roxar_project))
-                elif PARSER.prog == "stratigraphy2json":
-                    DATA.append(get_stratigraphy_json(roxar_project))
-        except NotImplementedError:
-            print("Error: Roxar API needed.", file=sys.stderr)
-
-    INDENT = None
-    if ARGS.pretty:
-        INDENT = 4
-
-
-    print(json.dumps(DATA, indent=INDENT))
