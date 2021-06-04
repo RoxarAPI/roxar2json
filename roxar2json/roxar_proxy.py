@@ -1,8 +1,32 @@
 "Conditinal mock Roxar API for unit tests."
 
+class MockSurveyPointSeries:
+    "Mock Roxar API SurveyPointSeries."
+    def get_points(realisation=0):
+        try:
+            import numpy as np
+            return np.array([[1,2,3,4,5,6], [7,8,9,10,11,12]])
+        
+        except ModuleNotFoundError:
+            return MockSurveyPointSeries
+
+class MockLogRun:
+    "Mock Roxar API Log Run."
+    name = None
+    log_curves = ()
+
+class MockTrajectory:
+    "Mock Roxar API Trajectories."
+    log_runs = [MockLogRun()]
+    survey_point_series = MockSurveyPointSeries()
+
+    def get_measured_depths():
+        return [1,100]
+
 class MockWellBore:
     "Mock Roxar API WellBore."
-    trajectories = ()
+    name = None
+    trajectories = [MockTrajectory()]
 
 class MockWell:
     "Mock Roxar API Well."

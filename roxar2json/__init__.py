@@ -1,5 +1,5 @@
 import hashlib
-from . import geojson
+from . import geojson, jsonwelllog
 
 def generate_color(text):
     hash_object = hashlib.sha256()
@@ -64,6 +64,26 @@ def get_fault_polygons(project, horizon_name):
 
     feature_collection = geojson.create_feature_collection(features)
     return feature_collection
+def get_log_jsonwelllog(log_run, sample_size):
+    log = {}
+    log['header'] = jsonwelllog.create_header(log_run)
+    log['curves'] = jsonwelllog.create_curves(log_run)
+    log['data'] = jsonwelllog.create_data(log_run, sample_size)
+    return log
+
+def get_logs_jsonwelllog(project, log_runs, sample_size):
+    logs = []
+    for well in project.wells:
+        for trajectory in well.wellbore.trajectories:
+            try:
+                # There is no Roxar API to select default logrun
+                # So to keep the file size small, exporting only 1 logrun
+                # which is present in Volve.pro
+                log_run = trajectory.log_runs['BLOCKING']
+                logs.append(get_log_jsonwelllog(log_run, sample_size))
+            except:
+                continue
+    return logs
 
 def get_stratigraphy_json(project):
     stratigraphy = {'horizons': [], 'zones': []}
