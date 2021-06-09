@@ -26,17 +26,25 @@ def generate_color(text):
 
 def get_well_geojson(well):
     geometry = []
+    md = []
     color = generate_color(well.name)
-    feature = geojson.create_point(well.wellhead)
-    geometry.append(feature)
+    well_head_point = geojson.create_point(well.wellhead)
+    geometry.append(well_head_point)
 
     for trajectory in well.wellbore.trajectories:
-        coordinates = trajectory.survey_point_series.get_points()
-        feature = geojson.create_polyline(coordinates[:, :2].tolist())
-        geometry.append(feature)
+        coordinates = trajectory.survey_point_series.get_measured_depths_and_points()
+
+        # The first coordinate is MD, the rest is (x, y z).
+        md.append(coordinates[:, 0].tolist())
+        coordinates = coordinates[:, 1:3]
+
+        trajectory_polyline = geojson.create_polyline(coordinates.tolist())
+
+        geometry.append(trajectory_polyline)
 
     geometry_collection = geojson.create_collection(geometry)
-    return geojson.create_feature(geometry_collection, well.name, color)
+
+    return geojson.create_well_feature(geometry_collection, well.name, color, md)
 
 def get_wells_geojson(project):
     geometry = []

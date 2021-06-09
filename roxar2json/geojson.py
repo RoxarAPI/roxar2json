@@ -12,6 +12,12 @@ def create_feature(geometry, name, color):
     }
     return feature
 
+def create_well_feature(geometry, name, color, md):
+    "Create a well GeoJson feature with an MD property."
+
+    feature = create_feature(geometry, name, color)
+    feature["properties"]["md"] = md
+    return feature
 
 def create_collection(features):
     "Create GeoJson GeometryCollection from a set of features."
