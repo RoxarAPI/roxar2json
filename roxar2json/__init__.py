@@ -47,7 +47,7 @@ def get_wells_geojson(project):
 def get_fault_polygons(project, horizon_name):
     item = project.horizons[horizon_name]['ExtractedFaultLines']
     poly_data = item.get_values()
-    
+
     features = []
     for line in poly_data:
         polygon = geojson.create_polygon(line[:,:3].tolist())
