@@ -44,6 +44,19 @@ def get_wells_geojson(project):
         geometry.append(get_well_geojson(well))
     return geometry
 
+def get_fault_polygons(project, horizon_name):
+    item = project.horizons[horizon_name]['ExtractedFaultLines']
+    poly_data = item.get_values()
+    
+    features = []
+    for line in poly_data:
+        polygon = geojson.create_polygon(line[:,:3].tolist())
+        feature = geojson.create_feature(polygon, horizon_name, [0, 0, 0, 255])
+        features.append(feature)
+
+    feature_collection = geojson.create_feature_collection(features)
+    return feature_collection
+
 def get_stratigraphy_json(project):
     stratigraphy = {'horizons': [], 'zones': []}
     zones = project.zones
