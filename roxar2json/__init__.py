@@ -64,23 +64,33 @@ def get_fault_polygons(project, horizon_name):
 
     feature_collection = geojson.create_feature_collection(features)
     return feature_collection
-def get_log_jsonwelllog(log_run, sample_size):
+
+def get_log_jsonwelllog(log_run, sample_size=None):
     log = {}
     log['header'] = jsonwelllog.create_header(log_run)
     log['curves'] = jsonwelllog.create_curves(log_run)
     log['data'] = jsonwelllog.create_data(log_run, sample_size)
     return log
 
-def get_logs_jsonwelllog(project, log_runs, sample_size):
+def get_logs_jsonwelllog(project, selected_log_runs=None, sample_size=None):
     logs = []
+    log_runs = selected_log_runs if selected_log_runs else []
     for well in project.wells:
         for trajectory in well.wellbore.trajectories:
+            if not selected_log_runs:
+                for log in trajectory.log_runs:
+                    log_runs.append(log.name)
             try:
-                # There is no Roxar API to select default logrun
-                # So to keep the file size small, exporting only 1 logrun
-                # which is present in Volve.pro
-                log_run = trajectory.log_runs['BLOCKING']
-                logs.append(get_log_jsonwelllog(log_run, sample_size))
+                for log_run_name in log_runs:
+                    try:
+                        log_run = trajectory.log_runs[log_run_name]
+                        logs.append(get_log_jsonwelllog(log_run, sample_size))
+                    except KeyError as e:
+                        continue
+                # Export logs of only first available trajectory as there is
+                # JSONWellLog format expects only one trajectory associated to a well
+                # and there is no mechanism in RoxAPI to identify default trajectory.
+                break
             except:
                 continue
     return logs

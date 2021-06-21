@@ -6,22 +6,31 @@ class MockSurveyPointSeries:
         try:
             import numpy as np
             return np.array([[1,2,3,4,5,6], [7,8,9,10,11,12]])
-        
+
         except ModuleNotFoundError:
             return MockSurveyPointSeries
+
+class MockWellBoreReference:
+    name = None
+
+class MockTrajectoryReference:
+    wellbore = MockWellBoreReference
+    survey_point_series = MockSurveyPointSeries()
 
 class MockLogRun:
     "Mock Roxar API Log Run."
     name = None
     log_curves = ()
+    trajectory = MockTrajectoryReference
+
+    def get_measured_depths(self):
+        return [1,100]
+
 
 class MockTrajectory:
     "Mock Roxar API Trajectories."
     log_runs = [MockLogRun()]
     survey_point_series = MockSurveyPointSeries()
-
-    def get_measured_depths():
-        return [1,100]
 
 class MockWellBore:
     "Mock Roxar API WellBore."

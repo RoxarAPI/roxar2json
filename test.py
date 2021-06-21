@@ -63,10 +63,11 @@ class TestWellGeoJson(unittest.TestCase):
         well.name = ""
 
         well_head_geometry = {'type': 'Point', 'coordinates': None}
+        well_trajectory_geometry = {'type': "LineString", 'coordinates': [[1,2], [7,8]]}
 
         collection = {
             'type': "GeometryCollection",
-            "geometries": [well_head_geometry],
+            "geometries": [well_head_geometry, well_trajectory_geometry],
         }
 
         feature = {
@@ -81,16 +82,10 @@ class TestWellGeoJson(unittest.TestCase):
 class TestJsonWellLog(unittest.TestCase):
     def test_none(self):
         with self.assertRaises(AttributeError):
-            roxar2json.get_log_jsonwelllog(None)
+            roxar2json.get_log_jsonwelllog(None, None)
 
     def test_log_json_well_log(self):
         well = roxar_proxy.Well()
-        with self.assertRaises(AttributeError):
-            for trajectory in well.wellbore.trajectories:
-                for log_run in trajectory.log_runs:
-                   roxar2json.get_log_jsonwelllog(log_run)
-
-        well.name = ""
         log = []
         for trajectory in well.wellbore.trajectories:
             for log_run in trajectory.log_runs:
@@ -99,8 +94,10 @@ class TestJsonWellLog(unittest.TestCase):
             log,
             [
                 {
-                    'header': {},
-                    'curves': {'type': 'Point', 'coordinates': None},
+                    'header': {'name': None, 'well': None, 'field': None, 'date': None,
+                    'operator': None, 'startIndex': 1, 'endIndex': 100, 'step': None},
+                    'curves': [{'name': 'XY', 'description': 'continuous', 'quantity': 'm',
+                    'unit': 'm', 'valueType': 'float', 'dimensions': 2}],
                     'data': []
                 }
             ]

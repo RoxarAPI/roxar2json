@@ -3,8 +3,6 @@ import numpy as np
 from numpy.core.function_base import linspace
 from scipy.interpolate import interp1d
 
-STEP = 0.154
-
 "JSON Well Log function"
 
 def create_header(log_run):
@@ -69,27 +67,32 @@ def _get_closest_md(mds, sample_md):
 def _resample_mds(mds, step):
     return np.arange(mds[0], mds[-1], step)
 
-def _interpolate_log(original_mds, sampled_mds, logs):
+
+def _interpolate_log(log_run, log_values, sample_size):
+    original_mds = _get_mds(log_run)
+    sampled_mds = _get_mds(log_run, sample_size)
     resampled_logs = []
     for sample_md in sampled_mds:
         min_idx, max_idx = _get_closest_md(original_mds, sample_md)
 
         if max_idx is None:
-            resampled_logs.append(logs[min_idx])
+            resampled_logs.append(log_values[min_idx])
         else:
             sampled_log = _interpolate_log_at_md(
                 [original_mds[min_idx], original_mds[max_idx]],
-                [logs[min_idx], logs[max_idx]],
+                [log_values[min_idx], log_values[max_idx]],
                 sample_md)
             resampled_logs.append(sampled_log)
     return resampled_logs
 
+
 def _get_mds(log_run, sample_size=None):
     original_mds = log_run.get_measured_depths()
-    if sample_size > 0:
+    if sample_size and sample_size > 0:
         return _resample_mds(original_mds, sample_size)
     else:
         return original_mds
+
 
 def _get_xy_from_log(log_run, sample_size):
     xy = []
@@ -104,13 +107,10 @@ def _get_xy_from_log(log_run, sample_size):
 
 def _get_log_data(log_run, sample_size):
     log_data = []
-    original_mds = _get_mds(log_run)
-    sampled_mds = _get_mds(log_run, sample_size)
     for lc in log_run.log_curves:
         log_values = lc.get_values().tolist()
-        if sample_size > 0:
-            sampled_log_values = _interpolate_log(
-                original_mds, sampled_mds, log_values)
+        if sample_size and sample_size > 0:
+            sampled_log_values = _interpolate_log(log_run, log_values, sample_size)
             log_data.append(sampled_log_values)
         else:
             log_data.append(log_values)
