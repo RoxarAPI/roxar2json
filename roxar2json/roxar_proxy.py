@@ -2,7 +2,7 @@
 
 class MockSurveyPointSeries:
     "Mock Roxar API SurveyPointSeries."
-    def get_points(realisation=0):
+    def get_points(self, realisation=0):
         try:
             import numpy as np
             return np.array([[1,2,3,4,5,6], [7,8,9,10,11,12]])

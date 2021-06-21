@@ -1,6 +1,4 @@
-import sys
 import numpy as np
-from numpy.core.function_base import linspace
 from scipy.interpolate import interp1d
 
 "JSON Well Log function"

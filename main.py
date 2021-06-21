@@ -43,7 +43,8 @@ if __name__ == "__main__":
                 elif PARSER.prog == "logs2jsonwelllog":
                     log_runs = ARGS.log_run
                     sample_size = ARGS.sample_size
-                    DATA = roxar2json.get_logs_jsonwelllog(roxar_project, log_runs, sample_size)
+                    DATA = roxar2json.get_logs_jsonwelllog(
+                        roxar_project, log_runs, sample_size)
                 elif PARSER.prog == "stratigraphy2json":
                     DATA = roxar2json.get_stratigraphy_json(roxar_project)
         except NotImplementedError:

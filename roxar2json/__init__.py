@@ -85,7 +85,7 @@ def get_logs_jsonwelllog(project, selected_log_runs=None, sample_size=None):
                     try:
                         log_run = trajectory.log_runs[log_run_name]
                         logs.append(get_log_jsonwelllog(log_run, sample_size))
-                    except KeyError as e:
+                    except KeyError:
                         continue
                 # Export logs of only first available trajectory as there is
                 # JSONWellLog format expects only one trajectory associated to a well
