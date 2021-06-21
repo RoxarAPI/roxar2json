@@ -23,7 +23,7 @@ if __name__ == "__main__":
 
     ARGS = PARSER.parse_args()
 
-    DATA = []
+    DATA = {}
 
     # Suppress Roxar API warnings to stdout
     sys.stdout = os.fdopen(os.dup(1), 'w')
@@ -33,12 +33,12 @@ if __name__ == "__main__":
         try:
             with roxar.Project.open(path, readonly=True) as roxar_project:
                 if PARSER.prog == "wells2geojson":
-                    DATA.extend(roxar2json.get_wells_geojson(roxar_project))
+                    DATA = roxar2json.get_wells_geojson(roxar_project)
                 elif PARSER.prog == "faultlines2json":
                     horizon_name = ARGS.horizon
-                    DATA.append(roxar2json.get_fault_polygons(roxar_project, horizon_name))
+                    DATA = roxar2json.get_fault_polygons(roxar_project, horizon_name)
                 elif PARSER.prog == "stratigraphy2json":
-                    DATA.append(roxar2json.get_stratigraphy_json(roxar_project))
+                    DATA = roxar2json.get_stratigraphy_json(roxar_project)
         except NotImplementedError:
             print("Error: Roxar API needed.", file=sys.stderr)
 
@@ -47,4 +47,4 @@ if __name__ == "__main__":
         INDENT = 4
 
 
-    print(json.dumps(DATA[0], indent=INDENT))
+    print(json.dumps(DATA, indent=INDENT))

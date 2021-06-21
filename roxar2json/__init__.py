@@ -50,7 +50,7 @@ def get_wells_geojson(project):
     geometry = []
     for well in project.wells:
         geometry.append(get_well_geojson(well))
-    return geometry
+    return geojson.create_feature_collection(geometry)
 
 def get_fault_polygons(project, horizon_name):
     item = project.horizons[horizon_name]['ExtractedFaultLines']
