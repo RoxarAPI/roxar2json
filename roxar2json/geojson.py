@@ -37,3 +37,15 @@ def create_polyline(coordinates):
         "type": "LineString",
         "coordinates": coordinates,
     }
+
+def create_polygon(coordinates):
+    "Create GeoJson Polygon."
+    poly_coords = [coordinates]
+    return {
+        "type": "Polygon",
+        "coordinates": poly_coords,
+    }
+
+def create_feature_collection(features):
+    "Create GeoJson FeatureCollection from a set of features."
+    return {"type": "FeatureCollection", "features": features}

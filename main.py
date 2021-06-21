@@ -13,11 +13,13 @@ if __name__ == "__main__":
         description='Create Json data from RMS project.')
 
     PARSER.add_argument('project', type=str, nargs='+', help='RMS project path')
+    PARSER.add_argument('--horizon', type=str)
     PARSER.add_argument(
         '-p',
         '--pretty',
         action="store_true",
         help='Encode with indentation')
+
 
     ARGS = PARSER.parse_args()
 
@@ -32,6 +34,9 @@ if __name__ == "__main__":
             with roxar.Project.open(path, readonly=True) as roxar_project:
                 if PARSER.prog == "wells2geojson":
                     DATA.extend(roxar2json.get_wells_geojson(roxar_project))
+                elif PARSER.prog == "faultlines2json":
+                    horizon_name = ARGS.horizon
+                    DATA.append(roxar2json.get_fault_polygons(roxar_project, horizon_name))
                 elif PARSER.prog == "stratigraphy2json":
                     DATA.append(roxar2json.get_stratigraphy_json(roxar_project))
         except NotImplementedError:
@@ -42,4 +47,4 @@ if __name__ == "__main__":
         INDENT = 4
 
 
-    print(json.dumps(DATA, indent=INDENT))
+    print(json.dumps(DATA[0], indent=INDENT))
