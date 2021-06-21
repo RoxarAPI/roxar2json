@@ -36,6 +36,20 @@ class TestGeoJsonGeometryCollection(unittest.TestCase):
         collection = geojson.create_collection(None)
         self.assertIsNone(collection["geometries"])
 
+class TestGeoJsonFeature(unittest.TestCase):
+    def test_none(self):
+        geometry = geojson.create_point(None)
+        name = None
+        color = None
+        feature = geojson.create_feature(geometry, name, color)
+        self.assertEqual(
+            feature,
+            {
+                "type": "Feature",
+                "geometry": {"coordinates": None, "type": "Point"},
+                "properties": {"color": None, "name": None},
+            })
+
 class TestWellGeoJson(unittest.TestCase):
     def test_none(self):
         with self.assertRaises(AttributeError):
@@ -58,7 +72,7 @@ class TestWellGeoJson(unittest.TestCase):
         feature = {
             'type': 'Feature',
             'geometry': collection,
-            'properties': {'name': '', 'color': [255, 165, 172, 255]}
+            'properties': {'name': '', 'color': [255, 165, 172, 255], 'md': []}
         }
 
         geometry = roxar2json.get_well_geojson(well)
