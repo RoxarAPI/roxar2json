@@ -33,6 +33,8 @@ def get_well_geojson(well):
 
     for trajectory in well.wellbore.trajectories:
         coordinates = trajectory.survey_point_series.get_measured_depths_and_points()
+        if coordinates is None:
+            continue
 
         # The first coordinate is MD, the rest is (x, y z).
         md.append(coordinates[:, 0].tolist())

@@ -102,7 +102,9 @@ def _get_xy_from_log(log_run, sample_size):
     sps = log_run.trajectory.survey_point_series
     for md in log_mds:
         try:
-            xy.append(sps.interpolate_survey_point(md)[3:5].tolist())
+            xy_values = sps.interpolate_survey_point(md)
+            if xy_values:
+                xy.append(xy_values[3:5].tolist())
         except ValueError:
             return []
     return xy

@@ -9,7 +9,7 @@ class MockSurveyPointSeries:
             return np.array([[1,2], [3,4], [5,6]])
 
         except ModuleNotFoundError:
-            return MockSurveyPointSeries
+            return None
 
     @classmethod
     def interpolate_survey_point(cls, md):
@@ -18,7 +18,7 @@ class MockSurveyPointSeries:
             return np.array([md])
 
         except ModuleNotFoundError:
-            return MockSurveyPointSeries
+            return None
 
 class MockWellBoreReference:
     name = None
