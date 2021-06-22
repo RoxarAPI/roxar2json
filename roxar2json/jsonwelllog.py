@@ -1,8 +1,5 @@
 "JSON Well Log function"
 
-import numpy as np
-from scipy.interpolate import interp1d
-
 def create_header(log_run):
     "Create JSON Well Log header"
     header = {}
@@ -50,21 +47,28 @@ def _interpolate_log_at_md(mds, logs, log_at_md):
     if logs[1] is None:
         return logs[0]
 
-    log_interp = interp1d(mds, logs, kind='nearest')
-    return log_interp(log_at_md).tolist()
-
+    try:
+        from scipy.interpolate import interp1d
+        log_interp = interp1d(mds, logs, kind='nearest')
+        return log_interp(log_at_md).tolist()
+    except ModuleNotFoundError:
+        return None
 
 def _get_closest_md(mds, sample_md):
-    min_idx = np.nonzero(mds<=sample_md)[0][-1]
-    if min_idx == len(mds)-1:
-        return min_idx, None
-    return min_idx, min_idx+1
-
+    try:
+        import numpy as np
+        min_idx = np.nonzero(mds<=sample_md)[0][-1]
+        if min_idx == len(mds)-1:
+            return min_idx, None
+        return min_idx, min_idx+1
+    except ModuleNotFoundError:
+        return None
 
 def _resample_mds(mds, step):
     try:
+        import numpy as np
         return np.arange(mds[0], mds[-1], step)
-    except IndexError:
+    except (ModuleNotFoundError, IndexError):
         return mds
 
 def _interpolate_log(log_run, log_values, sample_size):
