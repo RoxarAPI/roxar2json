@@ -63,11 +63,10 @@ class TestWellGeoJson(unittest.TestCase):
         well.name = ""
 
         well_head_geometry = {'type': 'Point', 'coordinates': None}
-        well_trajectory_geometry = {'type': "LineString", 'coordinates': [[2], [4], [6]]}
 
         collection = {
             'type': "GeometryCollection",
-            "geometries": [well_head_geometry, well_trajectory_geometry],
+            "geometries": [well_head_geometry],
         }
 
         feature = {
