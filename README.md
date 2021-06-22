@@ -1,5 +1,6 @@
 [![Pylint](https://github.com/RoxarAPI/roxar2json/workflows/Pylint/badge.svg)](https://github.com/RoxarAPI/roxar2json/actions/workflows/pylint.yml)
 [![Unit tests](https://github.com/RoxarAPI/roxar2json/workflows/Python%20unit%20tests/badge.svg)](https://github.com/RoxarAPI/roxar2json/actions/workflows/python-app.yml)
+[![codecov](https://codecov.io/gh/RoxarAPI/roxar2json/branch/master/graph/badge.svg)](https://codecov.io/gh/RoxarAPI/roxar2json)
 
 # Roxar2json
 Serializes wells and stratigraphy info from RMS projects to Json encoding.
