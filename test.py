@@ -73,7 +73,7 @@ class TestWellGeoJson(unittest.TestCase):
         feature = {
             'type': 'Feature',
             'geometry': collection,
-            'properties': {'name': '', 'color': [255, 165, 172, 255], 'md':[[1, 3, 5]]}
+            'properties': {'name': '', 'color': [255, 165, 172, 255], 'md':[]}
         }
 
         geometry = roxar2json.get_well_geojson(well)
