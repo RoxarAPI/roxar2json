@@ -1,7 +1,7 @@
+"JSON Well Log function"
+
 import numpy as np
 from scipy.interpolate import interp1d
-
-"JSON Well Log function"
 
 def create_header(log_run):
     "Create JSON Well Log header"
@@ -14,7 +14,7 @@ def create_header(log_run):
     try:
         header['startIndex'] = log_run.get_measured_depths()[0]
         header['endIndex'] = log_run.get_measured_depths()[-1]
-    except:
+    except IndexError:
         header['startIndex'] = None
         header['endIndex'] = None
 
@@ -58,13 +58,14 @@ def _get_closest_md(mds, sample_md):
     min_idx = np.nonzero(mds<=sample_md)[0][-1]
     if min_idx == len(mds)-1:
         return min_idx, None
-    else:
-        return min_idx, min_idx+1
+    return min_idx, min_idx+1
 
 
 def _resample_mds(mds, step):
-    return np.arange(mds[0], mds[-1], step)
-
+    try:
+        return np.arange(mds[0], mds[-1], step)
+    except IndexError:
+        return mds
 
 def _interpolate_log(log_run, log_values, sample_size):
     original_mds = _get_mds(log_run)
@@ -88,8 +89,7 @@ def _get_mds(log_run, sample_size=None):
     original_mds = log_run.get_measured_depths()
     if sample_size and sample_size > 0:
         return _resample_mds(original_mds, sample_size)
-    else:
-        return original_mds
+    return original_mds
 
 
 def _get_xy_from_log(log_run, sample_size):
@@ -99,7 +99,7 @@ def _get_xy_from_log(log_run, sample_size):
     for md in log_mds:
         try:
             xy.append(sps.interpolate_survey_point(md)[3:5].tolist())
-        except:
+        except ValueError:
             return []
     return xy
 
@@ -121,5 +121,4 @@ def create_data(log_run, sample_size):
 
     if xy and log_data:
         return [xy]+log_data
-    else:
-        return []
+    return []

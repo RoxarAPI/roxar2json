@@ -2,7 +2,8 @@
 
 class MockSurveyPointSeries:
     "Mock Roxar API SurveyPointSeries."
-    def get_points(self, realisation=0):
+    @staticmethod
+    def get_points():
         try:
             import numpy as np
             return np.array([[1,2,3,4,5,6], [7,8,9,10,11,12]])
@@ -23,7 +24,8 @@ class MockLogRun:
     log_curves = ()
     trajectory = MockTrajectoryReference
 
-    def get_measured_depths(self):
+    @staticmethod
+    def get_measured_depths():
         return [1,100]
 
 

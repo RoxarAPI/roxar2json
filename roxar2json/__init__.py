@@ -91,7 +91,7 @@ def get_logs_jsonwelllog(project, selected_log_runs=None, sample_size=None):
                 # JSONWellLog format expects only one trajectory associated to a well
                 # and there is no mechanism in RoxAPI to identify default trajectory.
                 break
-            except:
+            except ValueError:
                 continue
     return logs
 
