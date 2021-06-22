@@ -17,17 +17,24 @@ import roxar2json
 with roxar.Project.open(project_path) as project:
     stratigraphy = roxar2json.get_stratigraphy_json(project)
     wells = roxar2json.get_wells_geojson(project)
+    logs = roxar2json.get_logs_jsonwelllog(project)
 ```
 
 Synopsis:
 ```sh
 ./wells2geojson -h
+./logs2jsonwelllog -h
 ./stratigraphy2json -h
 ```
 
 Extract wells geometry:
 ```sh
 roxenv python wells2geojson <RMS project path>
+```
+
+Extract well logs:
+```sh
+roxenv python logs2jsonwelllog <RMS project path>
 ```
 
 Extract stratigraphy:

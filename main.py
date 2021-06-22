@@ -14,6 +14,8 @@ if __name__ == "__main__":
 
     PARSER.add_argument('project', type=str, nargs='+', help='RMS project path')
     PARSER.add_argument('--horizon', type=str)
+    PARSER.add_argument('--log_run', type=str, nargs='+', help='List of log runs to export')
+    PARSER.add_argument('--sample_size', type=float, help='Logs resampling rate')
     PARSER.add_argument(
         '-p',
         '--pretty',
@@ -37,6 +39,11 @@ if __name__ == "__main__":
                 elif PARSER.prog == "faultlines2json":
                     horizon_name = ARGS.horizon
                     DATA = roxar2json.get_fault_polygons(roxar_project, horizon_name)
+                elif PARSER.prog == "logs2jsonwelllog":
+                    log_runs = ARGS.log_run
+                    sample_size = ARGS.sample_size
+                    DATA = roxar2json.get_logs_jsonwelllog(
+                        roxar_project, log_runs, sample_size)
                 elif PARSER.prog == "stratigraphy2json":
                     DATA = roxar2json.get_stratigraphy_json(roxar_project)
         except NotImplementedError:
