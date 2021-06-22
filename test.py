@@ -72,12 +72,35 @@ class TestWellGeoJson(unittest.TestCase):
         feature = {
             'type': 'Feature',
             'geometry': collection,
-            'properties': {'name': '', 'color': [255, 165, 172, 255], 'md': []}
+            'properties': {'name': '', 'color': [255, 165, 172, 255], 'md':[]}
         }
 
         geometry = roxar2json.get_well_geojson(well)
-
         self.assertEqual(geometry, feature)
+
+class TestJsonWellLog(unittest.TestCase):
+    def test_none(self):
+        with self.assertRaises(AttributeError):
+            roxar2json.get_log_jsonwelllog(None, None)
+
+    def test_log_json_well_log(self):
+        well = roxar_proxy.Well()
+        log = []
+        for trajectory in well.wellbore.trajectories:
+            for log_run in trajectory.log_runs:
+                log.append(roxar2json.get_log_jsonwelllog(log_run))
+        self.assertEqual(
+            log,
+            [
+                {
+                    'header': {'name': None, 'well': None, 'field': None, 'date': None,
+                    'operator': None, 'startIndex': 1, 'endIndex': 100, 'step': None},
+                    'curves': [{'name': 'XY', 'description': 'continuous', 'quantity': 'm',
+                    'unit': 'm', 'valueType': 'float', 'dimensions': 2}],
+                    'data': []
+                }
+            ]
+        )
 
 class TestStratigraphyJson(unittest.TestCase):
     def test_none(self):
