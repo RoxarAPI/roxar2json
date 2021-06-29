@@ -72,6 +72,7 @@ def get_log_jsonwelllog(log_run, sample_size=None):
     log['header'] = jsonwelllog.create_header(log_run)
     log['curves'] = jsonwelllog.create_curves(log_run)
     log['data'] = jsonwelllog.create_data(log_run, sample_size)
+    log['metadata_discrete'] = jsonwelllog.create_discrete_metadata(log_run)
     return log
 
 def get_logs_jsonwelllog(project, selected_log_runs=None, sample_size=None):

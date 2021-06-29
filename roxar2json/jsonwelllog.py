@@ -1,13 +1,13 @@
 "JSON Well Log function"
 
+import roxar2json
+
+
 def create_header(log_run):
     "Create JSON Well Log header"
     header = {}
     header['name'] = log_run.name
     header['well'] = log_run.trajectory.wellbore.name
-    header['field'] = None
-    header['date'] = None
-    header['operator'] = None
     try:
         header['startIndex'] = log_run.get_measured_depths()[0]
         header['endIndex'] = log_run.get_measured_depths()[-1]
@@ -103,7 +103,7 @@ def _get_xy_from_log(log_run, sample_size):
     for md in log_mds:
         try:
             xy_values = sps.interpolate_survey_point(md)
-            if xy_values:
+            if len(xy_values) > 0:
                 xy.append(xy_values[3:5].tolist())
         except ValueError:
             return []
@@ -128,3 +128,24 @@ def create_data(log_run, sample_size):
     if xy and log_data:
         return [xy]+log_data
     return []
+
+
+def _create_log_curve_metadata(discrete_log_curve):
+    metadata = {}
+    metadata["attributes"] = ["color", "code"]
+
+    object_data = {}
+    for code, label in discrete_log_curve.get_code_names().items():
+        object_data[label] = [roxar2json.generate_color(label), code]
+
+    metadata["objects"] = object_data
+    return metadata
+
+def create_discrete_metadata(log_run):
+    metadata = {}
+    for lc in log_run.log_curves:
+        # Continuous logs don't have labels
+        if not lc.is_discrete:
+            continue
+        metadata[lc.name] = _create_log_curve_metadata(lc)
+    return metadata
