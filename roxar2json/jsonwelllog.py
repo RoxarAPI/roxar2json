@@ -1,6 +1,6 @@
 "JSON Well Log function"
 
-import roxar2json
+from .utilities import generate_color
 
 
 def create_header(log_run):
@@ -103,7 +103,7 @@ def _get_xy_from_log(log_run, sample_size):
     for md in log_mds:
         try:
             xy_values = sps.interpolate_survey_point(md)
-            if len(xy_values) > 0:
+            if xy_values and len(xy_values) > 0:
                 xy.append(xy_values[3:5].tolist())
         except ValueError:
             return []
@@ -136,7 +136,7 @@ def _create_log_curve_metadata(discrete_log_curve):
 
     object_data = {}
     for code, label in discrete_log_curve.get_code_names().items():
-        object_data[label] = [roxar2json.generate_color(label), code]
+        object_data[label] = [generate_color(label), code]
 
     metadata["objects"] = object_data
     return metadata
