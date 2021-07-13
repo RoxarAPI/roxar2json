@@ -95,8 +95,8 @@ class TestJsonWellLog(unittest.TestCase):
                 {
                     'header': {'name': None, 'well': None, 'startIndex': 1,
                     'endIndex': 100, 'step': None},
-                    'curves': [{'name': 'XY', 'description': 'continuous', 'quantity': 'm',
-                    'unit': 'm', 'valueType': 'float', 'dimensions': 2}],
+                    'curves': [{'name': 'MD', 'description': 'continuous', 'quantity': 'm',
+                    'unit': 'm', 'valueType': 'float', 'dimensions': 1}],
                     'metadata_discrete': {},
                     'data': []
                 }

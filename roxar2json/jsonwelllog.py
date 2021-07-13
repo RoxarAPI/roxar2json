@@ -31,7 +31,7 @@ def create_curve(name, kind, unit, dimension):
 def create_curves(log_run):
     "Create JSON Well Log curves"
     curves = []
-    curves.append(create_curve("XY", "continuous", "m", 2))
+    curves.append(create_curve("MD", "continuous", "m", 1))
     for log_curve in log_run.log_curves:
         curves.append(create_curve(log_curve.name,
                                    log_curve.kind,
@@ -39,30 +39,6 @@ def create_curves(log_run):
                                    log_curve.shape[1]))
     return curves
 
-def _interpolate_log_at_md(mds, logs, log_at_md):
-    if (logs == [None, None]):
-        return None
-    if logs[0] is None:
-        return logs[1]
-    if logs[1] is None:
-        return logs[0]
-
-    try:
-        from scipy.interpolate import interp1d
-        log_interp = interp1d(mds, logs, kind='nearest')
-        return log_interp(log_at_md).tolist()
-    except ModuleNotFoundError:
-        return None
-
-def _get_closest_md(mds, sample_md):
-    try:
-        import numpy as np
-        min_idx = np.nonzero(mds<=sample_md)[0][-1]
-        if min_idx == len(mds)-1:
-            return min_idx, None
-        return min_idx, min_idx+1
-    except ModuleNotFoundError:
-        return None
 
 def _resample_mds(mds, step):
     try:
@@ -71,62 +47,61 @@ def _resample_mds(mds, step):
     except (ModuleNotFoundError, IndexError):
         return mds
 
-def _interpolate_log(log_run, log_values, sample_size):
-    original_mds = _get_mds(log_run)
-    sampled_mds = _get_mds(log_run, sample_size)
-    resampled_logs = []
-    for sample_md in sampled_mds:
-        min_idx, max_idx = _get_closest_md(original_mds, sample_md)
 
-        if max_idx is None:
-            resampled_logs.append(log_values[min_idx])
+def _interpolate_log(log_run, log_values, sample_size, is_discrete):
+    try:
+        import numpy as np
+        from scipy.interpolate import interp1d
+
+        original_mds = _get_mds(log_run)
+        sampled_mds = _get_mds(log_run, sample_size)
+        if is_discrete:
+            log_interp = interp1d(original_mds, log_values, kind="nearest")
+            sampled_values = log_interp(sampled_mds).astype(np.int32)
+            int_nan = np.array([np.nan]).astype(np.int32)[0]
+            sampled_values = np.where(sampled_values == int_nan, None, sampled_values)
         else:
-            sampled_log = _interpolate_log_at_md(
-                [original_mds[min_idx], original_mds[max_idx]],
-                [log_values[min_idx], log_values[max_idx]],
-                sample_md)
-            resampled_logs.append(sampled_log)
-    return resampled_logs
+            log_interp = interp1d(original_mds, log_values, kind="linear")
+            sampled_values = log_interp(sampled_mds)
+            sampled_values = np.where(np.isnan(sampled_values), None, sampled_values)
+
+        return sampled_values.tolist()
+
+    except ModuleNotFoundError:
+        return []
 
 
 def _get_mds(log_run, sample_size=None):
     original_mds = log_run.get_measured_depths()
     if sample_size and sample_size > 0:
-        return _resample_mds(original_mds, sample_size)
+        return _resample_mds(original_mds, sample_size).tolist()
     return original_mds
 
-
-def _get_xy_from_log(log_run, sample_size):
-    xy = []
-    log_mds = _get_mds(log_run, sample_size)
-    sps = log_run.trajectory.survey_point_series
-    for md in log_mds:
-        try:
-            xy_values = sps.interpolate_survey_point(md)
-            if xy_values and len(xy_values) > 0:
-                xy.append(xy_values[3:5].tolist())
-        except ValueError:
-            return []
-    return xy
 
 def _get_log_data(log_run, sample_size):
     log_data = []
     for lc in log_run.log_curves:
         log_values = lc.get_values().tolist()
         if sample_size and sample_size > 0:
-            sampled_log_values = _interpolate_log(log_run, log_values, sample_size)
+            sampled_log_values = _interpolate_log(
+                log_run,
+                log_values,
+                sample_size,
+                lc.is_discrete
+            )
             log_data.append(sampled_log_values)
         else:
             log_data.append(log_values)
     return log_data
 
+
 def create_data(log_run, sample_size):
     "Create JSON Well Log data"
-    xy = _get_xy_from_log(log_run, sample_size)
+    md = _get_mds(log_run, sample_size)
     log_data = _get_log_data(log_run, sample_size)
 
-    if xy and log_data:
-        return [xy]+log_data
+    if md and log_data:
+        return [md]+log_data
     return []
 
 
@@ -140,6 +115,7 @@ def _create_log_curve_metadata(discrete_log_curve):
 
     metadata["objects"] = object_data
     return metadata
+
 
 def create_discrete_metadata(log_run):
     metadata = {}
