@@ -18,7 +18,7 @@ def create_header(log_run):
     header['step'] = None
     return header
 
-def create_curve(name, kind, unit, dimension):
+def create_curve(name, kind, unit, dimension, interpolation_type):
     curve = {}
     curve['name'] = name
     curve['description'] = kind
@@ -26,17 +26,19 @@ def create_curve(name, kind, unit, dimension):
     curve['unit'] = unit
     curve['valueType'] = "float" if kind == "continuous" else "integer"
     curve['dimensions'] = dimension
+    curve['interpolationType'] = interpolation_type
     return curve
 
 def create_curves(log_run):
     "Create JSON Well Log curves"
     curves = []
-    curves.append(create_curve("MD", "continuous", "m", 1))
+    curves.append(create_curve("MD", "continuous", "m", 1, "continuous"))
     for log_curve in log_run.log_curves:
         curves.append(create_curve(log_curve.name,
                                    log_curve.kind,
                                    log_curve.unit,
-                                   log_curve.shape[1]))
+                                   log_curve.shape[1],
+                                   log_curve.interpolation_type.name))
     return curves
 
 
@@ -101,7 +103,7 @@ def create_data(log_run, sample_size):
     log_data = _get_log_data(log_run, sample_size)
 
     if md and log_data:
-        return [md]+log_data
+        return list(zip(md, *log_data))
     return []
 
 

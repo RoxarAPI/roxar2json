@@ -88,17 +88,24 @@ class TestJsonWellLog(unittest.TestCase):
         log = []
         for trajectory in well.wellbore.trajectories:
             for log_run in trajectory.log_runs:
-                log.append(roxar2json.get_log_jsonwelllog(log_run))
+                log.append(roxar2json.get_log_jsonwelllog(log_run, 20))
         self.assertEqual(
             log,
             [
                 {
-                    'header': {'name': None, 'well': None, 'startIndex': 1,
+                    'header': {'name': 'LogRun', 'well': None, 'startIndex': 1,
                     'endIndex': 100, 'step': None},
-                    'curves': [{'name': 'MD', 'description': 'continuous', 'quantity': 'm',
-                    'unit': 'm', 'valueType': 'float', 'dimensions': 1}],
-                    'metadata_discrete': {},
-                    'data': []
+                    'curves': [
+                        {'name': 'MD', 'description': 'continuous', 'quantity': 'm',
+                         'unit': 'm', 'valueType': 'float', 'dimensions': 1,
+                         'interpolationType': "continuous"},
+                        {'name': 'DiscreteLog', 'description': 'integer', 'quantity': 'm',
+                         'unit': 'm', 'valueType': 'integer', 'dimensions': 1,
+                         'interpolationType': 'interval'}
+                    ],
+                    'data': [(1, 1), (21, 1), (41, 1), (61, 2), (81, 2)],
+                    'metadata_discrete': {'DiscreteLog': {'attributes': ['color', 'code'],
+                    'objects': {'One': [[23, 36, 255, 255], 1]}}}
                 }
             ]
         )

@@ -27,10 +27,40 @@ class MockTrajectoryReference:
     wellbore = MockWellBoreReference
     survey_point_series = MockSurveyPointSeries()
 
+from enum import Enum, unique
+@unique
+class MockLogCurveInterpolationType(Enum):
+    "Mock Roxar API Log curve interpolation type enum"
+    continuous = 1
+    interval = 2
+    point = 3
+
+class MockLogCurve:
+    "Mock Roxar API Log Curve."
+    name = "DiscreteLog"
+    kind = "integer"
+    unit = "m"
+    is_discrete = True
+    interpolation_type = MockLogCurveInterpolationType.interval
+    shape = (2,1)
+
+    @classmethod
+    def get_code_names(cls):
+        return {1: "One"}
+
+    @classmethod
+    def get_values(cls):
+        try:
+            import numpy as np
+            return np.array([1,2])
+
+        except ModuleNotFoundError:
+            return None
+
 class MockLogRun:
     "Mock Roxar API Log Run."
-    name = None
-    log_curves = ()
+    name = "LogRun"
+    log_curves = [MockLogCurve()]
     trajectory = MockTrajectoryReference
 
     @classmethod
