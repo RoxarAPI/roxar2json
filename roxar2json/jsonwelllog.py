@@ -45,7 +45,7 @@ def create_curves(log_run):
 def _resample_mds(mds, step):
     try:
         import numpy as np
-        return np.arange(mds[0], mds[-1], step)
+        return np.arange(mds[0], mds[-1], step).tolist()
     except (ModuleNotFoundError, IndexError):
         return mds
 
@@ -76,7 +76,7 @@ def _interpolate_log(log_run, log_values, sample_size, is_discrete):
 def _get_mds(log_run, sample_size=None):
     original_mds = log_run.get_measured_depths()
     if sample_size and sample_size > 0:
-        return _resample_mds(original_mds, sample_size).tolist()
+        return _resample_mds(original_mds, sample_size)
     return original_mds
 
 
