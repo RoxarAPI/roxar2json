@@ -57,6 +57,7 @@ def _interpolate_log(log_run, log_values, sample_size, is_discrete):
 
         original_mds = _get_mds(log_run)
         sampled_mds = _get_mds(log_run, sample_size)
+        log_values = log_values.tolist()
         if is_discrete:
             log_interp = interp1d(original_mds, log_values, kind="nearest")
             sampled_values = log_interp(sampled_mds).astype(np.int32)
@@ -83,19 +84,17 @@ def _get_mds(log_run, sample_size=None):
 def _get_log_data(log_run, sample_size):
     log_data = []
     for lc in log_run.log_curves:
-        log_values = lc.get_values().tolist()
         if sample_size and sample_size > 0:
             sampled_log_values = _interpolate_log(
                 log_run,
-                log_values,
+                lc.get_values(),
                 sample_size,
                 lc.is_discrete
             )
             log_data.append(sampled_log_values)
         else:
-            log_data.append(log_values)
+            log_data.append(lc.get_values().tolist())
     return log_data
-
 
 def create_data(log_run, sample_size):
     "Create JSON Well Log data"
