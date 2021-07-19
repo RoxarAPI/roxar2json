@@ -1,4 +1,5 @@
 "Conditinal mock Roxar API for unit tests."
+from enum import Enum, unique
 
 class MockSurveyPointSeries:
     "Mock Roxar API SurveyPointSeries."
@@ -27,7 +28,6 @@ class MockTrajectoryReference:
     wellbore = MockWellBoreReference
     survey_point_series = MockSurveyPointSeries()
 
-from enum import Enum, unique
 @unique
 class MockLogCurveInterpolationType(Enum):
     "Mock Roxar API Log curve interpolation type enum"
