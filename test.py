@@ -103,7 +103,7 @@ class TestJsonWellLog(unittest.TestCase):
                          'unit': 'm', 'valueType': 'integer', 'dimensions': 1,
                          'interpolationType': 'interval'}
                     ],
-                    'data': [(1, 1), (21, 1), (41, 1), (61, 2), (81, 2)],
+                    'data': [],
                     'metadata_discrete': {'DiscreteLog': {'attributes': ['color', 'code'],
                     'objects': {'One': [[23, 36, 255, 255], 1]}}}
                 }
