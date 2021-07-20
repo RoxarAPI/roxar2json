@@ -36,9 +36,13 @@ def get_well_geojson(well):
         if coordinates is None:
             continue
 
+        # Change sign of z axis.
+        for p in coordinates:
+           p[3] = -p[3]
+
         # The first coordinate is MD, the rest is (x, y z).
         md.append(coordinates[:, 0].tolist())
-        coordinates = coordinates[:, 1:3]
+        coordinates = coordinates[:, 1:4]
 
         trajectory_polyline = geojson.create_polyline(coordinates.tolist())
 
