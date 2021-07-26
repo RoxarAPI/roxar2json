@@ -1,28 +1,6 @@
-import hashlib
+from .utilities import generate_color
 from . import geojson, jsonwelllog
 
-def generate_color(text):
-    hash_object = hashlib.sha256()
-    hash_object.update(text.encode('ascii', errors='replace'))
-    digest = hash_object.digest()
-    segment_size = int(hash_object.digest_size / 3)
-    red = int.from_bytes(digest[:segment_size], 'big') % 255
-    green = int.from_bytes(digest[segment_size:-segment_size], 'big') % 255
-    blue = int.from_bytes(digest[-segment_size:], 'big') % 255
-
-    max_intensity = max(red, green, blue)
-
-    frac = 255 / max_intensity
-
-    red *= frac
-    green *= frac
-    blue *= frac
-
-    red = int(red)
-    green = int(green)
-    blue = int(blue)
-
-    return [red, green, blue, 255]
 
 def get_well_geojson(well):
     geometry = []
@@ -76,6 +54,7 @@ def get_log_jsonwelllog(log_run, sample_size=None):
     log['header'] = jsonwelllog.create_header(log_run)
     log['curves'] = jsonwelllog.create_curves(log_run)
     log['data'] = jsonwelllog.create_data(log_run, sample_size)
+    log['metadata_discrete'] = jsonwelllog.create_discrete_metadata(log_run)
     return log
 
 def get_logs_jsonwelllog(project, selected_log_runs=None, sample_size=None):
