@@ -16,7 +16,7 @@ def get_well_geojson(well):
 
         # Change sign of z axis.
         for p in coordinates:
-           p[3] = -p[3]
+            p[3] = -p[3]
 
         # The first coordinate is MD, the rest is (x, y z).
         md.append(coordinates[:, 0].tolist())
