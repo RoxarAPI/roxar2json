@@ -1,6 +1,5 @@
 "Conditinal mock Roxar API for unit tests."
 from enum import Enum, unique
-import numpy
 
 class MockSurveyPointSeries:
     "Mock Roxar API SurveyPointSeries."

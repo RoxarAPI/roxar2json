@@ -67,19 +67,16 @@ def get_logs_jsonwelllog(project, selected_log_runs=None, sample_size=None):
             if not selected_log_runs:
                 for log in trajectory.log_runs:
                     log_runs.append(log.name)
-            try:
-                for log_run_name in log_runs:
-                    try:
-                        log_run = trajectory.log_runs[log_run_name]
-                        logs.append(get_log_jsonwelllog(log_run, sample_size))
-                    except KeyError:
-                        continue
-                # Export logs of only first available trajectory as there is
-                # JSONWellLog format expects only one trajectory associated to a well
-                # and there is no mechanism in RoxAPI to identify default trajectory.
-                break
-            except ValueError:
-                continue
+            for log_run_name in log_runs:
+                try:
+                    log_run = trajectory.log_runs[log_run_name]
+                    logs.append(get_log_jsonwelllog(log_run, sample_size))
+                except KeyError:
+                    continue
+            # Export logs of only first available trajectory as there is
+            # JSONWellLog format expects only one trajectory associated to a well
+            # and there is no mechanism in RoxAPI to identify default trajectory.
+            break
     return logs
 
 def get_stratigraphy_json(project):

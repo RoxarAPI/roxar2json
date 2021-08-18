@@ -102,11 +102,10 @@ def _get_log_data(log_run, sample_size):
 
 def create_data(log_run, sample_size):
     "Create JSON Well Log data"
-    #import pdb; pdb.set_trace()
     md = _get_mds(log_run, sample_size)
     log_data = _get_log_data(log_run, sample_size)
 
-    if md and log_data:
+    if md.any() and log_data:
         return list(zip(md, *log_data))
     return []
 

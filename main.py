@@ -30,8 +30,7 @@ if __name__ == "__main__":
                 '--log_run',
                 type=str,
                 nargs='+',
-                help='List of log runs to export',
-                required=True)
+                help='List of log runs to export')
         PARSER.add_argument('--sample_size', type=float, help='Logs resampling rate')
 
     ARGS = PARSER.parse_args()
