@@ -56,6 +56,10 @@ def _interpolate_log(log_run, log_values, sample_size, is_discrete):
         from scipy.interpolate import interp1d
 
         original_mds = _get_mds(log_run)
+
+        if not original_mds:
+            return []
+
         sampled_mds = _get_mds(log_run, sample_size)
         log_values = log_values.tolist()
         if is_discrete:
@@ -98,6 +102,7 @@ def _get_log_data(log_run, sample_size):
 
 def create_data(log_run, sample_size):
     "Create JSON Well Log data"
+    #import pdb; pdb.set_trace()
     md = _get_mds(log_run, sample_size)
     log_data = _get_log_data(log_run, sample_size)
 

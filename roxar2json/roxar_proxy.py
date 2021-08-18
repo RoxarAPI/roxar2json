@@ -1,16 +1,15 @@
 "Conditinal mock Roxar API for unit tests."
 from enum import Enum, unique
+import numpy
 
 class MockSurveyPointSeries:
     "Mock Roxar API SurveyPointSeries."
-    @classmethod
-    def get_measured_depths_and_points(cls):
-        try:
-            import numpy as np
-            return np.array([[1,2], [3,4], [5,6]])
 
-        except ModuleNotFoundError:
-            return None
+    def __init__(self):
+        self.survey_points = None
+
+    def get_measured_depths_and_points(self):
+        return self.survey_points
 
     @classmethod
     def interpolate_survey_point(cls, md):
@@ -59,13 +58,14 @@ class MockLogCurve:
 
 class MockLogRun:
     "Mock Roxar API Log Run."
+
     name = "LogRun"
     log_curves = [MockLogCurve()]
     trajectory = MockTrajectoryReference
+    measured_depths = []
 
-    @classmethod
-    def get_measured_depths(cls):
-        return [1,100]
+    def get_measured_depths(self):
+        return self.measured_depths
 
 class MockTrajectory:
     "Mock Roxar API Trajectories."
@@ -173,9 +173,18 @@ def conditional_horizon_type_type():
     except ModuleNotFoundError:
         return MockHorizonType
 
+def conditional_trajectory_type():
+    return MockTrajectory
+
+def conditional_log_run_type():
+    return MockLogRun
 
 Well = conditional_well_type()
 
 Project = conditional_project_type()
 
 HorizonType = conditional_horizon_type_type()
+
+Trajectory = conditional_trajectory_type()
+
+LogRun = conditional_log_run_type()
