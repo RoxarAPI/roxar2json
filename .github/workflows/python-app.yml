@@ -22,12 +22,12 @@ jobs:
         python-version: 3.9
     - name: Run unit tests
       run: |
+        pip install numpy
         python test.py
     - name: Generate coverage report
       run: |
         pip install pytest
         pip install pytest-cov
-        pip install numpy
         pytest --cov=./ --cov-report=xml test.py
     - name: Codecov
       uses: codecov/codecov-action@v1.5.2
