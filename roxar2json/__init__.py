@@ -2,6 +2,20 @@ from .utilities import generate_color
 from . import geojson, jsonwelllog
 
 
+def get_trajectory_geojson(trajectory):
+    coordinates = trajectory.survey_point_series.get_measured_depths_and_points()
+    if coordinates is None:
+        return None
+
+    # Change sign of z axis.
+    coordinates[:, 3] = -coordinates[:, 3]
+
+    # The first coordinate is MD, the rest is (x, y z).
+    coordinates = coordinates[:, 1:4]
+
+    return geojson.create_polyline(coordinates.tolist())
+
+
 def get_well_geojson(well):
     geometry = []
     md = []
@@ -14,14 +28,10 @@ def get_well_geojson(well):
         if coordinates is None:
             continue
 
-        # Change sign of z axis.
-        coordinates[:, 3] = -coordinates[:, 3]
-
         # The first coordinate is MD, the rest is (x, y z).
         md.append(coordinates[:, 0].tolist())
-        coordinates = coordinates[:, 1:4]
 
-        trajectory_polyline = geojson.create_polyline(coordinates.tolist())
+        trajectory_polyline = get_trajectory_geojson(trajectory)
 
         geometry.append(trajectory_polyline)
 

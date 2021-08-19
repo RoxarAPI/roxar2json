@@ -88,6 +88,18 @@ class TestWellGeoJson(unittest.TestCase):
 
         self.assertEqual(data.tolist(), [p0, p1])
 
+        geometry = roxar2json.get_trajectory_geojson(trajectory)
+        self.assertEqual(
+            geometry,
+            {
+                "type": "LineString",
+                "coordinates": [
+                    [0.0, 0.0, -0.0],
+                    [1.0, 1.0, -1.0],
+                ],
+            },
+        )
+
 
 class TestJsonWellLog(unittest.TestCase):
     def test_none(self):
