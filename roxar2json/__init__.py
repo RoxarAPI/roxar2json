@@ -11,14 +11,11 @@ def get_well_geojson(well):
 
     for trajectory in well.wellbore.trajectories:
         coordinates = trajectory.survey_point_series.get_measured_depths_and_points()
-        print(coordinates)
         if coordinates is None:
             continue
 
         # Change sign of z axis.
         coordinates[:, 3] = -coordinates[:, 3]
-        #for p in coordinates:
-        #   p[3] = -p[3]
 
         # The first coordinate is MD, the rest is (x, y z).
         md.append(coordinates[:, 0].tolist())

@@ -58,8 +58,6 @@ class TestWellGeoJson(unittest.TestCase):
 
     def test_well_geojson(self):
         well = roxar_proxy.Well()
-        with self.assertRaises(AttributeError):
-            roxar2json.get_well_geojson(well)
 
         well.name = ""
 
@@ -84,7 +82,7 @@ class TestWellGeoJson(unittest.TestCase):
         p1 = [1, 1, 1, 1]
 
         trajectory = roxar_proxy.Trajectory()
-        trajectory.survey_point_series.survey_points = numpy.array([p0, p1])
+        trajectory.survey_point_series.set_measured_depths_and_points([p0, p1])
 
         data = trajectory.survey_point_series.get_measured_depths_and_points()
 
@@ -98,98 +96,88 @@ class TestJsonWellLog(unittest.TestCase):
     def test_empty_log_json_well_log(self):
         log_run = roxar_proxy.LogRun()
 
-        log = []
-
-        log.append(roxar2json.get_log_jsonwelllog(log_run, 20))
+        log = roxar2json.get_log_jsonwelllog(log_run, 20)
 
         self.assertEqual(
             log,
-            [
-                {
-                    'header': {
-                        'name': 'LogRun',
-                        'well': None,
-                        'startIndex': None,
-                        'endIndex': None,
-                        'step': None,
+            {
+                'header': {
+                    'name': 'LogRun',
+                    'well': 'Well',
+                    'startIndex': None,
+                    'endIndex': None,
+                    'step': None,
+                },
+                'curves': [
+                    {
+                        'name': 'MD',
+                        'description': 'continuous',
+                        'quantity': 'm',
+                        'unit': 'm',
+                        'valueType': 'float',
+                        'dimensions': 1,
+                        'interpolationType': "continuous",
                     },
-                    'curves': [
-                        {
-                            'name': 'MD',
-                            'description': 'continuous',
-                            'quantity': 'm',
-                            'unit': 'm',
-                            'valueType': 'float',
-                            'dimensions': 1,
-                            'interpolationType': "continuous",
-                        },
-                        {
-                            'name': 'DiscreteLog',
-                            'description': 'integer',
-                            'quantity': 'm',
-                            'unit': 'm',
-                            'valueType': 'integer',
-                            'dimensions': 1, 'interpolationType': 'interval'
-                        },
-                    ],
-                    'data': [],
-                    'metadata_discrete': {
-                        'DiscreteLog': {
-                            'attributes': ['color', 'code'],
-                            'objects': {'One': [[23, 36, 255, 255], 1]},
-                        },
-                    },
-                }
-            ]
+                ],
+                'data': [],
+                'metadata_discrete': {
+                },
+            }
         )
 
-    def test_log(self):
+    def test_log_curve(self):
         log_run = roxar_proxy.LogRun()
-        log_run.measured_depths = [1, 100]
 
-        log = []
+        log_run.set_measured_depths([1., 100.])
 
-        log.append(roxar2json.get_log_jsonwelllog(log_run))
+        curves = log_run.log_curves
+
+        curve = curves.create_discrete("DiscreteLog")
+
+        curve.set_values([1, 2])
+        curve.set_code_names({1: "One"})
+        curve.interpolation_type = roxar_proxy.LogCurveInterpolationType.interval
+
+        log = roxar2json.get_log_jsonwelllog(log_run)
 
         self.assertEqual(
             log,
-            [
-                {
-                    'header': {
-                        'name': 'LogRun',
-                        'well': None,
-                        'startIndex': 1,
-                        'endIndex': 100,
-                        'step': None,
+            {
+                'header': {
+                    'name': 'LogRun',
+                    'well': 'Well',
+                    'startIndex': 1.0,
+                    'endIndex': 100.0,
+                    'step': None,
+                },
+                'curves': [
+                    {
+                        'name': 'MD',
+                        'description': 'continuous',
+                        'quantity': 'm',
+                        'unit': 'm',
+                        'valueType': 'float',
+                        'dimensions': 1,
+                        'interpolationType': "continuous",
                     },
-                    'curves': [
-                        {
-                            'name': 'MD',
-                            'description': 'continuous',
-                            'quantity': 'm',
-                            'unit': 'm',
-                            'valueType': 'float',
-                            'dimensions': 1,
-                            'interpolationType': "continuous",
-                        },
-                        {
-                            'name': 'DiscreteLog',
-                            'description': 'integer',
-                            'quantity': 'm',
-                            'unit': 'm',
-                            'valueType': 'integer',
-                            'dimensions': 1, 'interpolationType': 'interval'
-                        },
-                    ],
-                    'data': [(1, 1), (100, 2)],
-                    'metadata_discrete': {
-                        'DiscreteLog': {
-                            'attributes': ['color', 'code'],
-                            'objects': {'One': [[23, 36, 255, 255], 1]},
-                        },
+                    {
+                        'name': 'DiscreteLog',
+                        'description': 'discrete',
+                        'quantity': 'DISC',
+                        'unit': 'DISC',
+                        'valueType': 'integer',
+                        'dimensions': 1,
+                        'interpolationType': 'interval'
                     },
-                }
-            ]
+                ],
+                'data': [(1.0, 1), (100.0, 2)],
+                'metadata_discrete': {
+                    'DiscreteLog': {
+                        'attributes': ['color', 'code'],
+                        'objects': {'One': [[23, 36, 255, 255], 1]},
+                    },
+                },
+            }
         )
 
 class TestStratigraphyJson(unittest.TestCase):

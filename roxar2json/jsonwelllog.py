@@ -57,7 +57,7 @@ def _interpolate_log(log_run, log_values, sample_size, is_discrete):
 
         original_mds = _get_mds(log_run)
 
-        if not original_mds:
+        if not original_mds.size > 0:
             return []
 
         sampled_mds = _get_mds(log_run, sample_size)

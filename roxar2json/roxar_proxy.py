@@ -1,5 +1,15 @@
 "Conditinal mock Roxar API for unit tests."
 from enum import Enum, unique
+import numpy as np
+
+ROXAR_FOUND = True
+try:
+    import roxar
+    import roxar.wells
+except ModuleNotFoundError:
+    ROXAR_FOUND = False
+
+PROJECT = None
 
 class MockSurveyPointSeries:
     "Mock Roxar API SurveyPointSeries."
@@ -10,17 +20,15 @@ class MockSurveyPointSeries:
     def get_measured_depths_and_points(self):
         return self.survey_points
 
+    def set_measured_depths_and_points(self, value):
+        self.survey_points = np.array(value)
+
     @classmethod
     def interpolate_survey_point(cls, md):
-        try:
-            import numpy as np
-            return np.array([md])
-
-        except ModuleNotFoundError:
-            return None
+        return np.array([md])
 
 class MockWellBoreReference:
-    name = None
+    name = "Well"
 
 class MockTrajectoryReference:
     wellbore = MockWellBoreReference
@@ -36,32 +44,48 @@ class MockLogCurveInterpolationType(Enum):
 class MockLogCurve:
     "Mock Roxar API Log Curve."
     name = "DiscreteLog"
-    kind = "integer"
-    unit = "m"
+    kind = "discrete"
+    unit = "DISC"
     is_discrete = True
     interpolation_type = MockLogCurveInterpolationType.interval
     shape = (2,1)
 
-    @classmethod
-    def get_code_names(cls):
-        return {1: "One"}
+    def get_code_names(self):
+        return self.code_names
 
-    @classmethod
-    def get_values(cls):
-        try:
-            import numpy as np
-            return np.array([1,2])
+    def __init__(self):
+        self.values = None
+        self.code_names = None
 
-        except ModuleNotFoundError:
-            return None
+    def get_values(self):
+        return self.values
+
+    def set_values(self, values):
+        self.values = np.array(values)
+
+    def set_code_names(self, name_map):
+        self.code_names = name_map
+
+class MockLogCurves(list):
+    "Mock Roxar API log curve container."
+
+    def create_discrete(self, *name):
+        curve = MockLogCurve()
+        self.append(curve)
+        return curve
 
 class MockLogRun:
     "Mock Roxar API Log Run."
 
     name = "LogRun"
-    log_curves = [MockLogCurve()]
     trajectory = MockTrajectoryReference
-    measured_depths = []
+
+    def __init__(self):
+        self.log_curves = MockLogCurves()
+        self.measured_depths = np.array([])
+
+    def set_measured_depths(self, value):
+        self.measured_depths = np.array(value)
 
     def get_measured_depths(self):
         return self.measured_depths
@@ -73,12 +97,12 @@ class MockTrajectory:
 
 class MockWellBore:
     "Mock Roxar API WellBore."
-    name = None
+    name = "Well"
     trajectories = [MockTrajectory()]
 
 class MockWell:
     "Mock Roxar API Well."
-    name = None
+    name = "Well"
     wellhead = None
     wellbore = MockWellBore()
 
@@ -154,9 +178,11 @@ def conditional_project_type():
         class RoxarProject(roxar.Project):
             "Roxar API project wrapper."
             def __new__(cls):
-                project = roxar._testing.create_example(
-                    roxar._testing.Example.none)
-                return project
+                global PROJECT
+                if not PROJECT:
+                    PROJECT = roxar._testing.create_example(
+                        roxar._testing.Example.none)
+                return PROJECT
 
         return RoxarProject
 
@@ -173,10 +199,53 @@ def conditional_horizon_type_type():
         return MockHorizonType
 
 def conditional_trajectory_type():
-    return MockTrajectory
+    "Conditionally get trajectory type."
+
+    try:
+        import roxar
+        import roxar.wells
+
+        class RoxarTrajectory(roxar.wells.Trajectory):
+            "Roxar Trajectory wrapper."
+            def __new__(cls):
+                ProjectType = conditional_project_type()
+                project = ProjectType()
+                wells = project.wells
+                well = wells.create("Well")
+                wellbore = well.wellbore
+                trajectory = wellbore.trajectories.create("_")
+                return trajectory
+
+        return RoxarTrajectory
+
+    except ModuleNotFoundError:
+        return MockTrajectory
 
 def conditional_log_run_type():
-    return MockLogRun
+    "Conditionally get log run type."
+
+    try:
+        import roxar
+        import roxar.wells
+
+        class RoxarLogRun(roxar.wells.LogRun):
+            "Roxar LogRun wrapper."
+            def __new__(cls):
+                TrajectoryType = conditional_trajectory_type()
+                trajectory = TrajectoryType()
+                log_runs = trajectory.log_runs
+                log_run = log_runs.create("LogRun")
+                return log_run
+
+        return RoxarLogRun
+    except ModuleNotFoundError:
+        return MockLogRun
+
+def conditional_log_curve_interpolation_type_type():
+    "Conditionally get log curve interpolation type"
+    if not ROXAR_FOUND:
+        return MockLogCurveInterpolationType
+    return roxar.LogCurveInterpolationType
 
 Well = conditional_well_type()
 
@@ -187,3 +256,6 @@ HorizonType = conditional_horizon_type_type()
 Trajectory = conditional_trajectory_type()
 
 LogRun = conditional_log_run_type()
+
+LogCurveInterpolationType = conditional_log_curve_interpolation_type_type()
+
