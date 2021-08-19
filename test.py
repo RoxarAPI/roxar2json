@@ -100,6 +100,39 @@ class TestWellGeoJson(unittest.TestCase):
             },
         )
 
+    def test_well_trajectory_collection(self):
+        p0 = [0, 0, 0, 0]
+        p1 = [1, 1, 1, 1]
+
+        well = roxar_proxy.Well()
+        well.name = ""
+
+        trajectory = well.wellbore.trajectories.create("Trajectory")
+        trajectory.survey_point_series.set_measured_depths_and_points([p0, p1])
+
+        well_head_geometry = {"type": "Point", "coordinates": None}
+        trajectory_geometry = {
+            "type": "LineString",
+            "coordinates": [
+                [0, 0, 0],
+                [1, 1, -1],
+            ],
+        }
+
+        collection = {
+            "type": "GeometryCollection",
+            "geometries": [well_head_geometry, trajectory_geometry],
+        }
+
+        feature = {
+            "type": "Feature",
+            "geometry": collection,
+            "properties": {"name": "", "color": [255, 165, 172, 255], "md": [[0, 1]]},
+        }
+
+        geometry = roxar2json.get_well_geojson(well)
+        self.assertEqual(geometry, feature)
+
 
 class TestJsonWellLog(unittest.TestCase):
     def test_none(self):
