@@ -29,32 +29,36 @@ def get_well_geojson(well):
 
     return geojson.create_well_feature(geometry_collection, well.name, color, md)
 
+
 def get_wells_geojson(project):
     geometry = []
     for well in project.wells:
         geometry.append(get_well_geojson(well))
     return geojson.create_feature_collection(geometry)
 
+
 def get_fault_polygons(project, horizon_name):
-    item = project.horizons[horizon_name]['ExtractedFaultLines']
+    item = project.horizons[horizon_name]["ExtractedFaultLines"]
     poly_data = item.get_values()
 
     features = []
     for line in poly_data:
-        polygon = geojson.create_polygon(line[:,:3].tolist())
+        polygon = geojson.create_polygon(line[:, :3].tolist())
         feature = geojson.create_feature(polygon, horizon_name, [0, 0, 0, 255])
         features.append(feature)
 
     feature_collection = geojson.create_feature_collection(features)
     return feature_collection
 
+
 def get_log_jsonwelllog(log_run, sample_size=None):
     log = {}
-    log['header'] = jsonwelllog.create_header(log_run)
-    log['curves'] = jsonwelllog.create_curves(log_run)
-    log['data'] = jsonwelllog.create_data(log_run, sample_size)
-    log['metadata_discrete'] = jsonwelllog.create_discrete_metadata(log_run)
+    log["header"] = jsonwelllog.create_header(log_run)
+    log["curves"] = jsonwelllog.create_curves(log_run)
+    log["data"] = jsonwelllog.create_data(log_run, sample_size)
+    log["metadata_discrete"] = jsonwelllog.create_discrete_metadata(log_run)
     return log
+
 
 def get_logs_jsonwelllog(project, selected_log_runs=None, sample_size=None):
     logs = []
@@ -76,17 +80,18 @@ def get_logs_jsonwelllog(project, selected_log_runs=None, sample_size=None):
             break
     return logs
 
+
 def get_stratigraphy_json(project):
-    stratigraphy = {'horizons': [], 'zones': []}
+    stratigraphy = {"horizons": [], "zones": []}
     zones = project.zones
     horizons = project.horizons
     for zone in zones:
         info = {
-            'name': zone.name,
-            'horizon_above': zone.horizon_above.name,
-            'horizon_below': zone.horizon_below.name
+            "name": zone.name,
+            "horizon_above": zone.horizon_above.name,
+            "horizon_below": zone.horizon_below.name,
         }
-        stratigraphy['zones'].append(info)
+        stratigraphy["zones"].append(info)
     for horizon in horizons:
-        stratigraphy['horizons'].append(horizon.name)
+        stratigraphy["horizons"].append(horizon.name)
     return stratigraphy

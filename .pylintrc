@@ -4,6 +4,5 @@ disable =
     missing-docstring,
     too-few-public-methods,
     import-error,
-    protected-access,
     invalid-name,
     import-outside-toplevel
