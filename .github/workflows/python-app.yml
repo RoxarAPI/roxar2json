@@ -22,6 +22,7 @@ jobs:
         python-version: 3.9
     - name: Run unit tests
       run: |
+        pip install numpy
         python test.py
     - name: Generate coverage report
       run: |

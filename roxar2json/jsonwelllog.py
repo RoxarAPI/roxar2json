@@ -6,45 +6,52 @@ from .utilities import generate_color
 def create_header(log_run):
     "Create JSON Well Log header"
     header = {}
-    header['name'] = log_run.name
-    header['well'] = log_run.trajectory.wellbore.name
+    header["name"] = log_run.name
+    header["well"] = log_run.trajectory.wellbore.name
     try:
-        header['startIndex'] = log_run.get_measured_depths()[0]
-        header['endIndex'] = log_run.get_measured_depths()[-1]
+        header["startIndex"] = log_run.get_measured_depths()[0]
+        header["endIndex"] = log_run.get_measured_depths()[-1]
     except IndexError:
-        header['startIndex'] = None
-        header['endIndex'] = None
+        header["startIndex"] = None
+        header["endIndex"] = None
 
-    header['step'] = None
+    header["step"] = None
     return header
+
 
 def create_curve(name, kind, unit, dimension, interpolation_type):
     curve = {}
-    curve['name'] = name
-    curve['description'] = kind
-    curve['quantity'] = unit
-    curve['unit'] = unit
-    curve['valueType'] = "float" if kind == "continuous" else "integer"
-    curve['dimensions'] = dimension
-    curve['interpolationType'] = interpolation_type
+    curve["name"] = name
+    curve["description"] = kind
+    curve["quantity"] = unit
+    curve["unit"] = unit
+    curve["valueType"] = "float" if kind == "continuous" else "integer"
+    curve["dimensions"] = dimension
+    curve["interpolationType"] = interpolation_type
     return curve
+
 
 def create_curves(log_run):
     "Create JSON Well Log curves"
     curves = []
     curves.append(create_curve("MD", "continuous", "m", 1, "continuous"))
     for log_curve in log_run.log_curves:
-        curves.append(create_curve(log_curve.name,
-                                   log_curve.kind,
-                                   log_curve.unit,
-                                   log_curve.shape[1],
-                                   log_curve.interpolation_type.name))
+        curves.append(
+            create_curve(
+                log_curve.name,
+                log_curve.kind,
+                log_curve.unit,
+                log_curve.shape[1],
+                log_curve.interpolation_type.name,
+            )
+        )
     return curves
 
 
 def _resample_mds(mds, step):
     try:
         import numpy as np
+
         return np.arange(mds[0], mds[-1], step).tolist()
     except (ModuleNotFoundError, IndexError):
         return mds
@@ -56,6 +63,10 @@ def _interpolate_log(log_run, log_values, sample_size, is_discrete):
         from scipy.interpolate import interp1d
 
         original_mds = _get_mds(log_run)
+
+        if not original_mds.size > 0:
+            return []
+
         sampled_mds = _get_mds(log_run, sample_size)
         log_values = log_values.tolist()
         if is_discrete:
@@ -86,22 +97,20 @@ def _get_log_data(log_run, sample_size):
     for lc in log_run.log_curves:
         if sample_size and sample_size > 0:
             sampled_log_values = _interpolate_log(
-                log_run,
-                lc.get_values(),
-                sample_size,
-                lc.is_discrete
+                log_run, lc.get_values(), sample_size, lc.is_discrete
             )
             log_data.append(sampled_log_values)
         else:
             log_data.append(lc.get_values().tolist())
     return log_data
 
+
 def create_data(log_run, sample_size):
     "Create JSON Well Log data"
     md = _get_mds(log_run, sample_size)
     log_data = _get_log_data(log_run, sample_size)
 
-    if md and log_data:
+    if md.any() and log_data:
         return list(zip(md, *log_data))
     return []
 
