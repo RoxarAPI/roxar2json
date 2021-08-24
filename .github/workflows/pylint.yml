@@ -1,4 +1,4 @@
-name: Pylint
+name: Lint and format
 
 on: [push]
 
@@ -9,14 +9,18 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    - name: Set up Python 3.8
+    - name: Set up Python 3.9
       uses: actions/setup-python@v1
       with:
-        python-version: 3.8
+        python-version: 3.9
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
         pip install pylint
+        pip install black==20.8b1
     - name: Analysing the code with pylint
       run: |
         pylint *.py **/*.py
+    - name: Check format with Black formatter
+      run: |
+        black --check .
