@@ -23,6 +23,7 @@ jobs:
     - name: Run unit tests
       run: |
         pip install numpy
+        pip install jsonschema
         python test.py
     - name: Generate coverage report
       run: |
