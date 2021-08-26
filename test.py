@@ -52,6 +52,7 @@ class TestGeoJsonFeature(unittest.TestCase):
             },
         )
 
+
 class TestGeoJsonFeatureCollection(unittest.TestCase):
     def test_none(self):
         geometry = geojson.create_point([1, 2])
@@ -71,6 +72,7 @@ class TestGeoJsonFeatureCollection(unittest.TestCase):
         with open("schema/FeatureCollection.json") as schema_file:
             schema = json.load(schema_file)
         jsonschema.validate(instance=feature_collection, schema=schema)
+
 
 class TestWellGeoJson(unittest.TestCase):
     def test_none(self):
