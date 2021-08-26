@@ -2,6 +2,8 @@
 
 import unittest
 import sys
+import json
+import jsonschema
 import roxar2json
 from roxar2json import geojson
 from roxar2json import roxar_proxy
@@ -49,6 +51,27 @@ class TestGeoJsonFeature(unittest.TestCase):
                 "properties": {"color": None, "name": None},
             },
         )
+
+
+class TestGeoJsonFeatureCollection(unittest.TestCase):
+    def test_none(self):
+        geometry = geojson.create_point([1, 2])
+        name = None
+        color = None
+        feature = geojson.create_feature(geometry, name, color)
+        self.assertEqual(
+            feature,
+            {
+                "type": "Feature",
+                "geometry": {"coordinates": [1, 2], "type": "Point"},
+                "properties": {"color": None, "name": None},
+            },
+        )
+        feature_collection = geojson.create_feature_collection([feature])
+        schema = None
+        with open("schema/FeatureCollection.json", encoding="utf-8") as schema_file:
+            schema = json.load(schema_file)
+        jsonschema.validate(instance=feature_collection, schema=schema)
 
 
 class TestWellGeoJson(unittest.TestCase):
