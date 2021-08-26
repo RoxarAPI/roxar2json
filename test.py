@@ -69,7 +69,7 @@ class TestGeoJsonFeatureCollection(unittest.TestCase):
         )
         feature_collection = geojson.create_feature_collection([feature])
         schema = None
-        with open("schema/FeatureCollection.json") as schema_file:
+        with open("schema/FeatureCollection.json", encoding="utf-8") as schema_file:
             schema = json.load(schema_file)
         jsonschema.validate(instance=feature_collection, schema=schema)
 
