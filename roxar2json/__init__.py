@@ -110,6 +110,7 @@ def get_stratigraphy_json(project):
 def get_grid_layer_data(project, grid_name, property_name):
     # note: property should be time dependent.
 
+    # pylint: disable=locally-disabled, too-many-locals
     grid_model = project.grid_models[grid_name]
     grid = grid_model.get_grid(realisation=0)
     geometry = grid.get_geometry()
@@ -120,7 +121,7 @@ def get_grid_layer_data(project, grid_name, property_name):
     tags = properties.get_tags(realisation=0)
     timesteps = len(tags)
 
-    ni, nj, nk = geometry.dimensions
+    ni, nj, _ = geometry.dimensions
     indexer = grid.grid_indexer
     cells = []
     k = 0
