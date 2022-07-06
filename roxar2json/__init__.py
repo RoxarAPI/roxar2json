@@ -1,6 +1,7 @@
 from .utilities import generate_color
 from . import geojson, jsonwelllog
 
+__version__ = "0.1.0"
 
 def get_trajectory_geojson(trajectory):
     coordinates = trajectory.survey_point_series.get_measured_depths_and_points()
