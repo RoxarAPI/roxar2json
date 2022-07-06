@@ -5,8 +5,8 @@ import sys
 import os
 import json
 
+import roxar_proxy as roxar
 import roxar2json
-from roxar2json import roxar_proxy as roxar
 
 if __name__ == "__main__":
     PARSER = argparse.ArgumentParser(description="Create Json data from RMS project.")
@@ -31,7 +31,7 @@ if __name__ == "__main__":
     # Grid layer arguments
     if PARSER.prog == "gridlayerdata":
         PARSER.add_argument("--grid_name", type=str)
-        PARSER.add_argument("--property_name", type=str)   
+        PARSER.add_argument("--property_name", type=str)
 
     ARGS = PARSER.parse_args()
 

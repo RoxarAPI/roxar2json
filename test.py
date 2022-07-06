@@ -4,9 +4,9 @@ import unittest
 import sys
 import json
 import jsonschema
+import roxar_proxy
 import roxar2json
 from roxar2json import geojson
-from roxar2json import roxar_proxy
 
 
 class TestGenerateColor(unittest.TestCase):
