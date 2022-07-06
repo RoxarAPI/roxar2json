@@ -24,5 +24,5 @@ setuptools.setup(
     python_requires=">=3.7",
     install_requires=[
         "roxar_proxy @ git+https://github.com/RoxarAPI/roxar_proxy#egg=roxar_proxy",
-    ]
+    ],
 )
