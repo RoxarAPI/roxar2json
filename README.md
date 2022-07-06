@@ -2,9 +2,17 @@
 [![Unit tests](https://github.com/RoxarAPI/roxar2json/workflows/Python%20unit%20tests/badge.svg)](https://github.com/RoxarAPI/roxar2json/actions/workflows/python-app.yml)
 [![codecov](https://codecov.io/gh/RoxarAPI/roxar2json/branch/master/graph/badge.svg)](https://codecov.io/gh/RoxarAPI/roxar2json)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+[![Conventional Commits](https://img.shields.io/badge/Conventional%20Commits-1.0.0-yellow.svg)](https://conventionalcommits.org)
 
 # Roxar2json
-Serializes wells and stratigraphy info from RMS projects to Json encoding.
+Serializes geological info from RMS projects to Json encoding.
+
+Supported geological data serializations:
+- Well trajectory -> [GeoJson](https://geojson.org/)
+- Well logs -> [Json Well Log Format](https://jsonwelllogformat.org/)
+- Stratigraphic column -> Custom Json format
+- Grid k-layers -> Custom Json format
+- Fault lines -> [GeoJson](https://geojson.org/)
 
 ## Installation
 ```sh
@@ -26,6 +34,8 @@ Synopsis:
 ./wells2geojson -h
 ./logs2jsonwelllog -h
 ./stratigraphy2json -h
+./faultlines2geojson -h
+./gridlayer2json -h
 ```
 
 Extract wells geometry:
@@ -47,3 +57,8 @@ roxenv python stratigraphy2json <RMS project path>
 ```python
 roxenv python test.py
 ```
+## Contributing
+Commit messages should follow [Conventional commits format](https://www.conventionalcommits.org/en/v1.0.0/)
+
+## Examples
+See [WebViz Subsurface Compnents](https://github.com/equinor/webviz-subsurface-components).
