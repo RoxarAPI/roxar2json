@@ -46,13 +46,13 @@ if __name__ == "__main__":
             with roxar.Project.open(path, readonly=True) as roxar_project:
                 if PARSER.prog == "wells2geojson":
                     DATA = roxar2json.get_wells_geojson(roxar_project)
-                elif PARSER.prog == "gridlayerdata":
+                elif PARSER.prog == "gridlayer2json":
                     grid_name = ARGS.grid_name
                     property_name = ARGS.property_name
                     DATA = roxar2json.get_grid_layer_data(
                         roxar_project, grid_name, property_name
                     )
-                elif PARSER.prog == "faultlines2json":
+                elif PARSER.prog == "faultlines2geojson":
                     horizon_name = ARGS.horizon
                     DATA = roxar2json.get_fault_polygons(roxar_project, horizon_name)
                 elif PARSER.prog == "logs2jsonwelllog":
