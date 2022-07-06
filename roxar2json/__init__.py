@@ -106,27 +106,34 @@ def get_stratigraphy_json(project):
         stratigraphy["horizons"].append(horizon.name)
     return stratigraphy
 
+
 def get_grid_layer_data(project, grid_name, property_name):
     # note: property should be time dependent.
 
+    # pylint: disable=locally-disabled, too-many-locals
     grid_model = project.grid_models[grid_name]
     grid = grid_model.get_grid(realisation=0)
     geometry = grid.get_geometry()
     properties = grid_model.properties[property_name]
     # keep for debug.
-    #print(properties.type)
-    #print(properties.data_type)
+    # print(properties.type)
+    # print(properties.data_type)
     tags = properties.get_tags(realisation=0)
     timesteps = len(tags)
 
-    ni, nj, nk = geometry.dimensions
+    ni, nj, _ = geometry.dimensions
     indexer = grid.grid_indexer
     cells = []
     k = 0
     for i in range(ni):
         for j in range(nj):
-            corners_all = grid.get_cell_corners_by_index((i,j,k)).tolist()
-            corners = [corners_all[0][0:3], corners_all[1][0:3], corners_all[3][0:3], corners_all[2][0:3] ]
+            corners_all = grid.get_cell_corners_by_index((i, j, k)).tolist()
+            corners = [
+                corners_all[0][0:3],
+                corners_all[1][0:3],
+                corners_all[3][0:3],
+                corners_all[2][0:3],
+            ]
 
             index = (i, j, k)
             if indexer.is_defined(index):
@@ -134,9 +141,21 @@ def get_grid_layer_data(project, grid_name, property_name):
 
                 property_values = []
                 for t in range(timesteps):
-                    property_values.append( float(properties.get_values(realisation=0, cell_numbers=cell_number, tag=t)) )
+                    property_values.append(
+                        float(
+                            properties.get_values(
+                                realisation=0, cell_numbers=cell_number, tag=t
+                            )
+                        )
+                    )
 
-                cell = {"i": i, "j": j, "z": corners_all[0][2], "cs": corners, "vs": property_values}
+                cell = {
+                    "i": i,
+                    "j": j,
+                    "z": corners_all[0][2],
+                    "cs": corners,
+                    "vs": property_values,
+                }
                 cells.append(cell)
 
     return cells
