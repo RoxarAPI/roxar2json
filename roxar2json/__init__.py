@@ -61,19 +61,21 @@ def get_fault_polygons(project, horizon_name):
     return feature_collection
 
 
-def get_log_jsonwelllog(log_run, sample_size=None):
+def get_log_jsonwelllog(log_run, sample_size=None, spread_logs=False):
     log = {}
     log["header"] = jsonwelllog.create_header(log_run)
     log["curves"] = jsonwelllog.create_curves(log_run)
     log["data"] = jsonwelllog.create_data(log_run, sample_size)
-    log["metadata_discrete"] = jsonwelllog.create_discrete_metadata(log_run)
-    return log
+    #log["metadata_discrete"] = jsonwelllog.create_discrete_metadata(log_run)
+    return [log]
 
 
-def get_logs_jsonwelllog(project, selected_log_runs=None, sample_size=None):
+def get_logs_jsonwelllog(project, selected_log_runs=None, sample_size=None, wells=None, encode_codenames=False, spread_logs=False):
     logs = []
     log_runs = selected_log_runs if selected_log_runs else []
     for well in project.wells:
+        if wells and well.name not in wells:
+            continue
         for trajectory in well.wellbore.trajectories:
             if not selected_log_runs:
                 for log in trajectory.log_runs:
@@ -81,7 +83,8 @@ def get_logs_jsonwelllog(project, selected_log_runs=None, sample_size=None):
             for log_run_name in log_runs:
                 try:
                     log_run = trajectory.log_runs[log_run_name]
-                    logs.append(get_log_jsonwelllog(log_run, sample_size))
+                    logs += get_log_jsonwelllog(log_run, sample_size, spread_logs)
+                    #logs.append(get_log_jsonwelllog(log_run, sample_size))
                 except KeyError:
                     continue
             # Export logs of only first available trajectory as there is
