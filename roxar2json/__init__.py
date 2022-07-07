@@ -1,5 +1,6 @@
 from .utilities import generate_color
 from . import geojson, jsonwelllog
+import numpy as np
 
 
 def get_trajectory_geojson(trajectory):
@@ -62,13 +63,23 @@ def get_fault_polygons(project, horizon_name):
 
 
 def get_log_jsonwelllog(log_run, sample_size=None, spread_logs=False):
-    log = {}
-    log["header"] = jsonwelllog.create_header(log_run)
-    log["curves"] = jsonwelllog.create_curves(log_run)
-    log["data"] = jsonwelllog.create_data(log_run, sample_size)
-    #log["metadata_discrete"] = jsonwelllog.create_discrete_metadata(log_run)
-    return [log]
+    header = jsonwelllog.create_header(log_run)
+    curve_headers = jsonwelllog.create_curves(log_run)
+    curves = jsonwelllog._get_log_data(log_run, sample_size)
+    md = jsonwelllog._get_mds(log_run, sample_size)
 
+    logs = []
+
+    for curve_header, curve in zip(curve_headers[1:], curves):
+        log = {}
+        log["header"] = header
+        log["curves"] = [curve_headers[0], curve_header]
+        stripped_md = md[~curve.mask]
+        curve = curve[~curve.mask]
+        log["data"] = [stripped_md.tolist(), curve.tolist()]
+        logs.append(log)
+
+    return logs
 
 def get_logs_jsonwelllog(project, selected_log_runs=None, sample_size=None, wells=None, encode_codenames=False, spread_logs=False):
     logs = []
@@ -84,7 +95,6 @@ def get_logs_jsonwelllog(project, selected_log_runs=None, sample_size=None, well
                 try:
                     log_run = trajectory.log_runs[log_run_name]
                     logs += get_log_jsonwelllog(log_run, sample_size, spread_logs)
-                    #logs.append(get_log_jsonwelllog(log_run, sample_size))
                 except KeyError:
                     continue
             # Export logs of only first available trajectory as there is

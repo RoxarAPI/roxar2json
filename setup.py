@@ -7,7 +7,7 @@ setuptools.setup(
     name="roxar2json",
     version="0.0.1",
     author="Havard Bjerke",
-    author_email="havard.bjerke@emerson.com",
+    author_email="havard.bjerke@aspentech.com",
     description="Roxar project Json encoding.",
     long_description=long_description,
     long_description_content_type="text/markdown",
