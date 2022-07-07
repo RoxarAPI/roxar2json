@@ -5,6 +5,8 @@ import sys
 import json
 import jsonschema
 import roxar2json
+import numpy
+import numpy.ma
 from roxar2json import geojson
 from roxar2json import roxar_proxy
 
@@ -247,6 +249,11 @@ class TestJsonWellLog(unittest.TestCase):
                 },
             },
         )
+
+    def test_filter_interval(self):
+        curve = numpy.ma.masked_array([1, 2, 2, 3], [False, False, False, False])
+        filtered = roxar2json.filter_interval(curve)
+        print(curve)
 
 
 class TestStratigraphyJson(unittest.TestCase):
