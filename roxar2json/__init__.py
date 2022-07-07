@@ -1,6 +1,7 @@
 from .utilities import generate_color
 from . import geojson, jsonwelllog
 import numpy as np
+import numpy.ma
 
 
 def get_trajectory_geojson(trajectory):
@@ -61,6 +62,11 @@ def get_fault_polygons(project, horizon_name):
     feature_collection = geojson.create_feature_collection(features)
     return feature_collection
 
+def filter_interval(curve):
+    "Collapse intervals."
+    adjacent = np.append(curve[1:], 0)
+    return numpy.ma.masked_where(curve.data == adjacent, curve)
+
 
 def get_log_jsonwelllog(log_run, sample_size=None, spread_logs=False):
     header = jsonwelllog.create_header(log_run)
@@ -74,6 +80,7 @@ def get_log_jsonwelllog(log_run, sample_size=None, spread_logs=False):
         log = {}
         log["header"] = header
         log["curves"] = [curve_headers[0], curve_header]
+        curve = filter_interval(curve)
         stripped_md = md[~curve.mask]
         curve = curve[~curve.mask]
         log["data"] = [stripped_md.tolist(), curve.tolist()]
