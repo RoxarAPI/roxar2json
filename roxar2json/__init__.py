@@ -62,13 +62,29 @@ def get_fault_polygons(project, horizon_name):
     feature_collection = geojson.create_feature_collection(features)
     return feature_collection
 
-def filter_interval(curve):
+
+def get_interval_mask(curve):
     "Collapse intervals."
-    adjacent = np.append(curve[1:], 0)
-    return numpy.ma.masked_where(curve.data == adjacent, curve)
+    adjacent = np.append([0], curve.data[:-1])
+    mask = (curve.data == adjacent)
+    return mask
+
+def collapse_interval(curve):
+    "Collapse intervals."
+    adjacent = np.append([0], curve.data[:-1])
+    collapsed = numpy.ma.masked_where(curve.data == adjacent, curve)
+    return collapsed
 
 
-def get_log_jsonwelllog(log_run, sample_size=None, spread_logs=False):
+def get_log_jsonwelllog(log_run, sample_size=None):
+    log = {}
+    log["header"] = jsonwelllog.create_header(log_run)
+    log["curves"] = jsonwelllog.create_curves(log_run)
+    log["data"] = jsonwelllog.create_data(log_run, sample_size)
+    log["metadata_discrete"] = jsonwelllog.create_discrete_metadata(log_run)
+    return log
+
+def get_interval_logs(log_run, sample_size=None):
     header = jsonwelllog.create_header(log_run)
     curve_headers = jsonwelllog.create_curves(log_run)
     curves = jsonwelllog._get_log_data(log_run, sample_size)
@@ -80,9 +96,9 @@ def get_log_jsonwelllog(log_run, sample_size=None, spread_logs=False):
         log = {}
         log["header"] = header
         log["curves"] = [curve_headers[0], curve_header]
-        curve = filter_interval(curve)
-        stripped_md = md[~curve.mask]
-        curve = curve[~curve.mask]
+        interval_mask = get_interval_mask(curve)
+        stripped_md = md[~interval_mask]
+        curve = curve[~interval_mask]
         log["data"] = [stripped_md.tolist(), curve.tolist()]
         logs.append(log)
 
