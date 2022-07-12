@@ -4,10 +4,10 @@ import unittest
 import sys
 import json
 import jsonschema
-import roxar_proxy
-import roxar2json
 import numpy
 import numpy.ma
+import roxar_proxy
+import roxar2json
 from roxar2json import geojson
 
 

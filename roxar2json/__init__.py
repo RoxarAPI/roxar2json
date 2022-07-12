@@ -1,7 +1,7 @@
-from .utilities import generate_color
-from . import geojson, jsonwelllog
 import numpy as np
 import numpy.ma
+from .utilities import generate_color
+from . import geojson, jsonwelllog
 
 __version__ = "0.0.0"
 
@@ -85,7 +85,7 @@ def get_interval_logs(log_run, sample_size=None):
     curve_headers = jsonwelllog.create_curves(log_run)
     curves = jsonwelllog._get_log_data(log_run, sample_size)
     md = jsonwelllog._get_mds(log_run, sample_size)
-	metadata_discrete = jsonwelllog.create_discrete_metadata(log_run)
+    metadata_discrete = jsonwelllog.create_discrete_metadata(log_run)
 
     logs = []
 

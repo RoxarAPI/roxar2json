@@ -1,8 +1,7 @@
 "JSON Well Log function"
 
-from .utilities import generate_color
 import numpy as np
-
+from .utilities import generate_color
 
 def create_header(log_run):
     "Create JSON Well Log header"
@@ -50,17 +49,13 @@ def create_curves(log_run):
 
 
 def _resample_mds(mds, step):
-    try:
-        import numpy as np
-
-        return np.arange(mds[0], mds[-1], step).tolist()
-    except (ModuleNotFoundError, IndexError):
-        return mds
+    if len(mds) == 0:
+        return np.array([])
+    return np.arange(mds[0], mds[-1], step).tolist()
 
 
 def _interpolate_log(log_run, log_values, sample_size, is_discrete):
     try:
-        import numpy as np
         from scipy.interpolate import interp1d
 
         original_mds = _get_mds(log_run)
