@@ -12,10 +12,10 @@ import roxar2json
 
 
 class NumpyEncoder(json.JSONEncoder):
-    def default(self, obj):
-        if isinstance(obj, numpy.ndarray):
-            return obj.tolist()
-        return json.JSONEncoder.default(self, obj)
+    def default(self, o):
+        if isinstance(o, numpy.ndarray):
+            return o.tolist()
+        return json.JSONEncoder.default(self, o)
 
 
 if __name__ == "__main__":

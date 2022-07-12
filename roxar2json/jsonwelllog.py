@@ -59,12 +59,12 @@ def _interpolate_log(log_run, log_values, sample_size, is_discrete):
     try:
         from scipy.interpolate import interp1d
 
-        original_mds = _get_mds(log_run)
+        original_mds = get_mds(log_run)
 
         if not original_mds.size > 0:
             return []
 
-        sampled_mds = _get_mds(log_run, sample_size)
+        sampled_mds = get_mds(log_run, sample_size)
         log_values = log_values.tolist()
         if is_discrete:
             log_interp = interp1d(original_mds, log_values, kind="nearest")
@@ -82,14 +82,14 @@ def _interpolate_log(log_run, log_values, sample_size, is_discrete):
         return []
 
 
-def _get_mds(log_run, sample_size=None):
+def get_mds(log_run, sample_size=None):
     original_mds = log_run.get_measured_depths()
     if sample_size and sample_size > 0:
         return _resample_mds(original_mds, sample_size)
     return original_mds
 
 
-def _get_log_data(log_run, sample_size):
+def get_log_data(log_run, sample_size):
     log_data = []
     for lc in log_run.log_curves:
         if sample_size and sample_size > 0:
@@ -104,8 +104,8 @@ def _get_log_data(log_run, sample_size):
 
 def create_data(log_run, sample_size):
     "Create JSON Well Log data"
-    md = _get_mds(log_run, sample_size)
-    log_data = _get_log_data(log_run, sample_size)
+    md = get_mds(log_run, sample_size)
+    log_data = get_log_data(log_run, sample_size)
 
     if md.any() and log_data:
         return list(zip(md, *log_data))
