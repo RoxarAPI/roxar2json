@@ -37,11 +37,18 @@ if __name__ == "__main__":
             "-l", "--log_run", type=str, nargs="+", help="List of log runs to export"
         )
         PARSER.add_argument(
-            "-w", "--well", type=str, nargs="+", help="List of wells to export logs from"
+            "-w",
+            "--well",
+            type=str,
+            nargs="+",
+            help="List of wells to export logs from",
         )
         PARSER.add_argument("--sample_size", type=float, help="Logs resampling rate")
         PARSER.add_argument(
-            "-s", "--spread", action="store_true", help="Spread logs into separate Json objects."
+            "-s",
+            "--spread",
+            action="store_true",
+            help="Spread logs into separate Json objects.",
         )
 
     # Grid layer arguments

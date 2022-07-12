@@ -274,12 +274,10 @@ class TestJsonWellLog(unittest.TestCase):
 
     def test_interval_mask(self):
         curve = numpy.ma.masked_array(
-                [1, 2, 2, 2, -999, -999, 1],
-                [False, False, False, False, True, True, False]
+            [1, 2, 2, 2, -999, -999, 1], [False, False, False, False, True, True, False]
         )
         mask = roxar2json.get_interval_mask(curve)
-        self.assertEqual(
-                mask.tolist(), [False, False, True, True, False, True, False])
+        self.assertEqual(mask.tolist(), [False, False, True, True, False, True, False])
 
 
 class TestStratigraphyJson(unittest.TestCase):
