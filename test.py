@@ -4,6 +4,8 @@ import unittest
 import sys
 import json
 import jsonschema
+import numpy
+import numpy.ma
 import roxar_proxy
 import roxar2json
 from roxar2json import geojson
@@ -247,6 +249,35 @@ class TestJsonWellLog(unittest.TestCase):
                 },
             },
         )
+
+    def test_interval_log(self):
+        log_run = roxar_proxy.LogRun()
+
+        log_run.set_measured_depths([1, 2, 3, 4, 5, 6, 7, 8])
+
+        curves = log_run.log_curves
+
+        curve = curves.create_discrete("DiscreteLog")
+
+        curve.set_values([1, 2, 2, 2, 1, -999, -999, 1])
+        curve.set_code_names({1: "One", 2: "Two"})
+        curve.interpolation_type = roxar_proxy.LogCurveInterpolationType.interval
+
+        logs = roxar2json.get_interval_logs(log_run)
+
+        curve_data = logs[0]["data"]
+        md = curve_data[0]
+        values = curve_data[1]
+
+        self.assertListEqual(md, [1, 2, 5, 6, 8])
+        self.assertListEqual(values, [1, 2, 1, None, 1])
+
+    def test_interval_mask(self):
+        curve = numpy.ma.masked_array(
+            [1, 2, 2, 2, -999, -999, 1], [False, False, False, False, True, True, False]
+        )
+        mask = roxar2json.get_interval_mask(curve)
+        self.assertEqual(mask.tolist(), [False, False, True, True, False, True, False])
 
 
 class TestStratigraphyJson(unittest.TestCase):

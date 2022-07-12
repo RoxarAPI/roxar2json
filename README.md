@@ -38,17 +38,29 @@ Synopsis:
 ./gridlayer2json -h
 ```
 
-Extract wells geometry:
+### Extract wells geometry:
 ```sh
 roxenv python wells2geojson <RMS project path>
 ```
 
-Extract well logs:
+### Extract well logs:
+Extract all wells and all log runs:
 ```sh
 roxenv python logs2jsonwelllog <RMS project path>
 ```
 
-Extract stratigraphy:
+Extract selected wells and selected log runs:
+```sh
+roxenv python logs2jsonwelllog --log_run BLOCKING --well '15/9-19 A' -- <RMS project path>
+```
+
+Spread log curves in order to maximise intervals:
+```sh
+roxenv python logs2jsonwelllog --spread -- <RMS project path>
+```
+
+
+### Extract stratigraphy:
 ```sh
 roxenv python stratigraphy2json <RMS project path>
 ```
