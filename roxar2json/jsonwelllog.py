@@ -3,6 +3,7 @@
 import numpy as np
 from .utilities import generate_color
 
+
 def create_header(log_run):
     "Create JSON Well Log header"
     header = {}

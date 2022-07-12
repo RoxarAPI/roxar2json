@@ -68,7 +68,7 @@ def get_fault_polygons(project, horizon_name):
 def get_interval_mask(curve):
     "Collapse intervals."
     adjacent = np.append([0], curve.data[:-1])
-    mask = (curve.data == adjacent)
+    mask = curve.data == adjacent
     return mask
 
 
@@ -79,6 +79,7 @@ def get_log_jsonwelllog(log_run, sample_size=None):
     log["data"] = jsonwelllog.create_data(log_run, sample_size)
     log["metadata_discrete"] = jsonwelllog.create_discrete_metadata(log_run)
     return log
+
 
 def get_interval_logs(log_run, sample_size=None):
     header = jsonwelllog.create_header(log_run)
@@ -102,7 +103,10 @@ def get_interval_logs(log_run, sample_size=None):
 
     return logs
 
-def get_logs_jsonwelllog(project, selected_log_runs=None, sample_size=None, wells=None, spread_logs=False):
+
+def get_logs_jsonwelllog(
+    project, selected_log_runs=None, sample_size=None, wells=None, spread_logs=False
+):
     logs = []
     log_runs = selected_log_runs if selected_log_runs else []
     for well in project.wells:
