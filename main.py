@@ -5,8 +5,18 @@ import sys
 import os
 import json
 
+import numpy
+
 import roxar_proxy as roxar
 import roxar2json
+
+
+class NumpyEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, numpy.ndarray):
+            return obj.tolist()
+        return json.JSONEncoder.default(self, obj)
+
 
 if __name__ == "__main__":
     PARSER = argparse.ArgumentParser(description="Create Json data from RMS project.")
@@ -30,9 +40,6 @@ if __name__ == "__main__":
             "-w", "--well", type=str, nargs="+", help="List of wells to export logs from"
         )
         PARSER.add_argument("--sample_size", type=float, help="Logs resampling rate")
-        PARSER.add_argument(
-            "-c", "--codenames", action="store_true", help="Encode code names"
-        )
         PARSER.add_argument(
             "-s", "--spread", action="store_true", help="Spread logs into separate Json objects."
         )
@@ -68,7 +75,7 @@ if __name__ == "__main__":
                     log_runs = ARGS.log_run
                     sample_size = ARGS.sample_size
                     DATA = roxar2json.get_logs_jsonwelllog(
-                        roxar_project, log_runs, sample_size, ARGS.well, ARGS.codenames, ARGS.spread
+                        roxar_project, log_runs, sample_size, ARGS.well, ARGS.spread
                     )
                 elif PARSER.prog == "stratigraphy2json":
                     DATA = roxar2json.get_stratigraphy_json(roxar_project)
@@ -79,4 +86,4 @@ if __name__ == "__main__":
     if ARGS.pretty:
         INDENT = 4
 
-    print(json.dumps(DATA, indent=INDENT))
+    print(json.dumps(DATA, indent=INDENT, cls=NumpyEncoder))

@@ -102,7 +102,6 @@ def _get_log_data(log_run, sample_size):
             )
             log_data.append(sampled_log_values)
         else:
-            #import pdb; pdb.set_trace()
             log_data.append(lc.get_values())
     return log_data
 

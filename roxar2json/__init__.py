@@ -71,12 +71,6 @@ def get_interval_mask(curve):
     mask = (curve.data == adjacent)
     return mask
 
-def collapse_interval(curve):
-    "Collapse intervals."
-    adjacent = np.append([0], curve.data[:-1])
-    collapsed = numpy.ma.masked_where(curve.data == adjacent, curve)
-    return collapsed
-
 
 def get_log_jsonwelllog(log_run, sample_size=None):
     log = {}
@@ -91,12 +85,14 @@ def get_interval_logs(log_run, sample_size=None):
     curve_headers = jsonwelllog.create_curves(log_run)
     curves = jsonwelllog._get_log_data(log_run, sample_size)
     md = jsonwelllog._get_mds(log_run, sample_size)
+	metadata_discrete = jsonwelllog.create_discrete_metadata(log_run)
 
     logs = []
 
     for curve_header, curve in zip(curve_headers[1:], curves):
         log = {}
         log["header"] = header
+        log["metadata_discrete"] = metadata_discrete
         log["curves"] = [curve_headers[0], curve_header]
         interval_mask = get_interval_mask(curve)
         stripped_md = md[~interval_mask]
@@ -106,7 +102,7 @@ def get_interval_logs(log_run, sample_size=None):
 
     return logs
 
-def get_logs_jsonwelllog(project, selected_log_runs=None, sample_size=None, wells=None, encode_codenames=False, spread_logs=False):
+def get_logs_jsonwelllog(project, selected_log_runs=None, sample_size=None, wells=None, spread_logs=False):
     logs = []
     log_runs = selected_log_runs if selected_log_runs else []
     for well in project.wells:
@@ -119,7 +115,10 @@ def get_logs_jsonwelllog(project, selected_log_runs=None, sample_size=None, well
             for log_run_name in log_runs:
                 try:
                     log_run = trajectory.log_runs[log_run_name]
-                    logs += get_log_jsonwelllog(log_run, sample_size, spread_logs)
+                    if spread_logs:
+                        logs += get_interval_logs(log_run, sample_size)
+                    else:
+                        logs.append(get_log_jsonwelllog(log_run, sample_size))
                 except KeyError:
                     continue
             # Export logs of only first available trajectory as there is
