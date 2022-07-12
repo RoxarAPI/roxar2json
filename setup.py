@@ -5,7 +5,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setuptools.setup(
     name="roxar2json",
-    version="0.0.1",
+    version="0.0.0",
     author="Havard Bjerke",
     author_email="havard.bjerke@aspentech.com",
     description="Roxar project Json encoding.",
@@ -22,4 +22,7 @@ setuptools.setup(
     ],
     packages=["roxar2json"],
     python_requires=">=3.7",
+    install_requires=[
+        "roxar_proxy @ git+https://github.com/RoxarAPI/roxar_proxy#egg=roxar_proxy",
+    ],
 )
