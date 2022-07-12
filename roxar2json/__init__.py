@@ -84,8 +84,8 @@ def get_log_jsonwelllog(log_run, sample_size=None):
 def get_interval_logs(log_run, sample_size=None):
     header = jsonwelllog.create_header(log_run)
     curve_headers = jsonwelllog.create_curves(log_run)
-    curves = jsonwelllog._get_log_data(log_run, sample_size)
-    md = jsonwelllog._get_mds(log_run, sample_size)
+    curves = jsonwelllog.get_log_data(log_run, sample_size)
+    md = jsonwelllog.get_mds(log_run, sample_size)
     metadata_discrete = jsonwelllog.create_discrete_metadata(log_run)
 
     logs = []
