@@ -15,6 +15,8 @@ class NumpyEncoder(json.JSONEncoder):
     def default(self, o):
         if isinstance(o, numpy.ndarray):
             return o.tolist()
+        if isinstance(o, numpy.int32):
+            return int(o)
         return json.JSONEncoder.default(self, o)
 
 
