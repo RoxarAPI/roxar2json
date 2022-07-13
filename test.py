@@ -188,7 +188,6 @@ class TestJsonWellLog(unittest.TestCase):
                         "unit": "m",
                         "valueType": "float",
                         "dimensions": 1,
-                        "interpolationType": "continuous",
                     },
                 ],
                 "data": [],
@@ -229,7 +228,6 @@ class TestJsonWellLog(unittest.TestCase):
                         "unit": "m",
                         "valueType": "float",
                         "dimensions": 1,
-                        "interpolationType": "continuous",
                     },
                     {
                         "name": "DiscreteLog",
@@ -238,7 +236,6 @@ class TestJsonWellLog(unittest.TestCase):
                         "unit": "DISC",
                         "valueType": "integer",
                         "dimensions": 1,
-                        "interpolationType": "interval",
                     },
                 ],
                 "data": [(1.0, 1), (100.0, 2)],

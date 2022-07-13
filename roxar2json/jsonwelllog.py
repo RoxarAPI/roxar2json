@@ -1,6 +1,7 @@
 "JSON Well Log function"
 
 import numpy as np
+from scipy.interpolate import interp1d
 from .utilities import generate_color
 
 
@@ -20,7 +21,7 @@ def create_header(log_run):
     return header
 
 
-def create_curve(name, kind, unit, dimension, interpolation_type):
+def create_curve(name, kind, unit, dimension):
     curve = {}
     curve["name"] = name
     curve["description"] = kind
@@ -28,14 +29,13 @@ def create_curve(name, kind, unit, dimension, interpolation_type):
     curve["unit"] = unit
     curve["valueType"] = "float" if kind == "continuous" else "integer"
     curve["dimensions"] = dimension
-    curve["interpolationType"] = interpolation_type
     return curve
 
 
 def create_curves(log_run):
     "Create JSON Well Log curves"
     curves = []
-    curves.append(create_curve("MD", "continuous", "m", 1, "continuous"))
+    curves.append(create_curve("MD", "continuous", "m", 1))
     for log_curve in log_run.log_curves:
         curves.append(
             create_curve(
@@ -43,7 +43,6 @@ def create_curves(log_run):
                 log_curve.kind,
                 log_curve.unit,
                 log_curve.shape[1],
-                log_curve.interpolation_type.name,
             )
         )
     return curves
@@ -52,34 +51,28 @@ def create_curves(log_run):
 def _resample_mds(mds, step):
     if len(mds) == 0:
         return np.array([])
-    return np.arange(mds[0], mds[-1], step).tolist()
+    return np.arange(mds[0], mds[-1], step)
 
 
 def _interpolate_log(log_run, log_values, sample_size, is_discrete):
-    try:
-        from scipy.interpolate import interp1d
+    original_mds = get_mds(log_run)
 
-        original_mds = get_mds(log_run)
+    if not original_mds.size > 0:
+        return np.array([])
 
-        if not original_mds.size > 0:
-            return []
+    sampled_mds = get_mds(log_run, sample_size)
+    log_values = log_values.tolist()
+    if is_discrete:
+        log_interp = interp1d(original_mds, log_values, kind="nearest")
+        sampled_values = log_interp(sampled_mds).astype(np.int32)
+        int_nan = np.array([np.nan]).astype(np.int32)[0]
+        sampled_values = np.where(sampled_values == int_nan, None, sampled_values)
+    else:
+        log_interp = interp1d(original_mds, log_values, kind="linear")
+        sampled_values = log_interp(sampled_mds)
+        sampled_values = np.where(np.isnan(sampled_values), None, sampled_values)
 
-        sampled_mds = get_mds(log_run, sample_size)
-        log_values = log_values.tolist()
-        if is_discrete:
-            log_interp = interp1d(original_mds, log_values, kind="nearest")
-            sampled_values = log_interp(sampled_mds).astype(np.int32)
-            int_nan = np.array([np.nan]).astype(np.int32)[0]
-            sampled_values = np.where(sampled_values == int_nan, None, sampled_values)
-        else:
-            log_interp = interp1d(original_mds, log_values, kind="linear")
-            sampled_values = log_interp(sampled_mds)
-            sampled_values = np.where(np.isnan(sampled_values), None, sampled_values)
-
-        return sampled_values.tolist()
-
-    except ModuleNotFoundError:
-        return []
+    return sampled_values
 
 
 def get_mds(log_run, sample_size=None):
