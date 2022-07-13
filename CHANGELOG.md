@@ -2,6 +2,11 @@
 
 <!--next-version-placeholder-->
 
+## v0.1.1 (2022-07-13)
+### Fix
+* **log_run:** Fixed consolidating curves starting with 0. ([`c673653`](https://github.com/RoxarAPI/roxar2json/commit/c6736539a6b7af12e56720b86c02230af6f764dd))
+* **well_logs:** Capture end interval. ([`8a771e8`](https://github.com/RoxarAPI/roxar2json/commit/8a771e83fffb16f1cad3ee88ab25fb0e80339456))
+
 ## v0.1.0 (2022-07-12)
 ### Feature
 * Collapse intervals. ([`8d14906`](https://github.com/RoxarAPI/roxar2json/commit/8d149067735b23b7bb3709e9d7b85796fdf93733))
