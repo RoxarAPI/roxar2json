@@ -331,9 +331,7 @@ class TestJsonWellLog(unittest.TestCase):
         self.assertEqual(mask.tolist(), [False, False, True, True, False, True, False])
 
     def test_interval_mask_zero(self):
-        curve = numpy.ma.masked_array(
-            [0, 0, 0, 0], [False, False, False, False]
-        )
+        curve = numpy.ma.masked_array([0, 0, 0, 0], [False, False, False, False])
         mask = roxar2json.get_interval_mask(curve)
         self.assertEqual(mask.tolist(), [False, True, True, True])
 
