@@ -73,7 +73,14 @@ def get_interval_mask(curve):
     elif np.issubdtype(curve.dtype, float):
         min_value = -np.Inf
     adjacent = np.append(min_value, curve.data[:-1])
-    mask = curve.data == adjacent
+
+    # Calculate mask.
+    mask = False
+    if isinstance(curve, numpy.ma.MaskedArray):
+        mask = curve.data == adjacent
+    else:
+        mask = curve == adjacent
+
     return mask
 
 
@@ -110,7 +117,7 @@ def get_interval_logs(log_run, sample_size=None):
         stripped_curve = curve[~interval_mask]
 
         # Capture end interval
-        if end_md != stripped_md[-1]:
+        if len(stripped_md) > 0 and end_md != stripped_md[-1]:
             stripped_curve = numpy.ma.append(stripped_curve, end_curve)
             stripped_md = numpy.ma.append(stripped_md, end_md)
 

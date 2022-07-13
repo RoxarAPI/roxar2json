@@ -188,7 +188,6 @@ class TestJsonWellLog(unittest.TestCase):
                         "unit": "m",
                         "valueType": "float",
                         "dimensions": 1,
-                        "interpolationType": "continuous",
                     },
                 ],
                 "data": [],
@@ -229,7 +228,6 @@ class TestJsonWellLog(unittest.TestCase):
                         "unit": "m",
                         "valueType": "float",
                         "dimensions": 1,
-                        "interpolationType": "continuous",
                     },
                     {
                         "name": "DiscreteLog",
@@ -238,7 +236,6 @@ class TestJsonWellLog(unittest.TestCase):
                         "unit": "DISC",
                         "valueType": "integer",
                         "dimensions": 1,
-                        "interpolationType": "interval",
                     },
                 ],
                 "data": [(1.0, 1), (100.0, 2)],
@@ -322,6 +319,14 @@ class TestJsonWellLog(unittest.TestCase):
 
         self.assertListEqual(md.tolist(), [1, 4])
         self.assertListEqual(values.tolist(), [None, None])
+
+    def test_none_interval(self):
+        self.log_run.set_measured_depths([1, 2, 3, 4])
+
+        curve = self.log_run.log_curves.create_discrete("DiscreteLog")
+
+        with self.assertRaises(ValueError):
+            curve.set_values([None, None, None, None])
 
     def test_interval_mask(self):
         curve = numpy.ma.masked_array(
