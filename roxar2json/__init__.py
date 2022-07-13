@@ -67,7 +67,12 @@ def get_fault_polygons(project, horizon_name):
 
 def get_interval_mask(curve):
     "Collapse intervals."
-    adjacent = np.append([0], curve.data[:-1])
+    min_value = None
+    if np.issubdtype(curve.dtype, np.integer):
+        min_value = np.iinfo(curve.dtype).min
+    elif np.issubdtype(curve.dtype, float):
+        min_value = -np.Inf
+    adjacent = np.append(min_value, curve.data[:-1])
     mask = curve.data == adjacent
     return mask
 
@@ -103,14 +108,14 @@ def get_interval_logs(log_run, sample_size=None):
         # Consolidate intervals
         interval_mask = get_interval_mask(curve)
         stripped_md = md[~interval_mask]
-        curve = curve[~interval_mask]
+        stripped_curve = curve[~interval_mask]
 
         # Capture end interval
         if end_md != stripped_md[-1]:
-            curve = numpy.ma.append(curve, end_curve)
+            stripped_curve = numpy.ma.append(stripped_curve, end_curve)
             stripped_md = numpy.ma.append(stripped_md, end_md)
 
-        log["data"] = [stripped_md, curve]
+        log["data"] = [stripped_md, stripped_curve]
         logs.append(log)
 
     return logs

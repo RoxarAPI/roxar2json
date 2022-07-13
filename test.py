@@ -287,12 +287,55 @@ class TestJsonWellLog(unittest.TestCase):
         self.assertListEqual(md.tolist(), [1, 2, 4])
         self.assertListEqual(values.tolist(), [1, 2, 2])
 
+    def test_flat_interval(self):
+        self.log_run.set_measured_depths([1, 2, 3, 4])
+
+        curve = self.log_run.log_curves.create_discrete("DiscreteLog")
+
+        curve.set_values([0, 0, 0, 0])
+        curve.set_code_names({1: "One"})
+        curve.interpolation_type = roxar_proxy.LogCurveInterpolationType.interval
+
+        logs = roxar2json.get_interval_logs(self.log_run)
+
+        curve_data = logs[0]["data"]
+        md = curve_data[0]
+        values = curve_data[1]
+
+        self.assertListEqual(md.tolist(), [1, 4])
+        self.assertListEqual(values.tolist(), [0, 0])
+
+    def test_undefined_interval(self):
+        self.log_run.set_measured_depths([1, 2, 3, 4])
+
+        curve = self.log_run.log_curves.create_discrete("DiscreteLog")
+
+        curve.set_values([-999, -999, -999, -999])
+        curve.set_code_names({1: "One"})
+        curve.interpolation_type = roxar_proxy.LogCurveInterpolationType.interval
+
+        logs = roxar2json.get_interval_logs(self.log_run)
+
+        curve_data = logs[0]["data"]
+        md = curve_data[0]
+        values = curve_data[1]
+
+        self.assertListEqual(md.tolist(), [1, 4])
+        self.assertListEqual(values.tolist(), [None, None])
+
     def test_interval_mask(self):
         curve = numpy.ma.masked_array(
             [1, 2, 2, 2, -999, -999, 1], [False, False, False, False, True, True, False]
         )
         mask = roxar2json.get_interval_mask(curve)
         self.assertEqual(mask.tolist(), [False, False, True, True, False, True, False])
+
+    def test_interval_mask_zero(self):
+        curve = numpy.ma.masked_array(
+            [0, 0, 0, 0], [False, False, False, False]
+        )
+        mask = roxar2json.get_interval_mask(curve)
+        self.assertEqual(mask.tolist(), [False, True, True, True])
 
 
 class TestStratigraphyJson(unittest.TestCase):
