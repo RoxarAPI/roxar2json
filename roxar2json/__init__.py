@@ -67,7 +67,12 @@ def get_fault_polygons(project, horizon_name):
 
 def get_interval_mask(curve):
     "Collapse intervals."
-    adjacent = np.append([0], curve.data[:-1])
+    min_value = None
+    if np.issubdtype(curve.dtype, np.integer):
+        min_value = np.iinfo(curve.dtype).min
+    elif np.issubdtype(curve.dtype, float):
+        min_value = -np.Inf
+    adjacent = np.append(min_value, curve.data[:-1])
     mask = curve.data == adjacent
     return mask
 
@@ -82,23 +87,34 @@ def get_log_jsonwelllog(log_run, sample_size=None):
 
 
 def get_interval_logs(log_run, sample_size=None):
-    header = jsonwelllog.create_header(log_run)
+    log_template = {}
+    log_template["header"] = jsonwelllog.create_header(log_run)
+    log_template["metadata_discrete"] = jsonwelllog.create_discrete_metadata(log_run)
     curve_headers = jsonwelllog.create_curves(log_run)
     curves = jsonwelllog.get_log_data(log_run, sample_size)
     md = jsonwelllog.get_mds(log_run, sample_size)
-    metadata_discrete = jsonwelllog.create_discrete_metadata(log_run)
+
+    end_md = md[-1]
 
     logs = []
 
     for curve_header, curve in zip(curve_headers[1:], curves):
-        log = {}
-        log["header"] = header
-        log["metadata_discrete"] = metadata_discrete
+        end_curve = curve[-1]
+
+        log = log_template.copy()
         log["curves"] = [curve_headers[0], curve_header]
+
+        # Consolidate intervals
         interval_mask = get_interval_mask(curve)
         stripped_md = md[~interval_mask]
-        curve = curve[~interval_mask]
-        log["data"] = [stripped_md.tolist(), curve.tolist()]
+        stripped_curve = curve[~interval_mask]
+
+        # Capture end interval
+        if end_md != stripped_md[-1]:
+            stripped_curve = numpy.ma.append(stripped_curve, end_curve)
+            stripped_md = numpy.ma.append(stripped_md, end_md)
+
+        log["data"] = [stripped_md, stripped_curve]
         logs.append(log)
 
     return logs
