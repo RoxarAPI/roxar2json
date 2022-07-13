@@ -2,6 +2,12 @@
 
 <!--next-version-placeholder-->
 
+## v0.1.4 (2022-07-13)
+### Fix
+* Fixed json encoding of zipped curves. ([`191646e`](https://github.com/RoxarAPI/roxar2json/commit/191646eb91dbc1d769359684560fd94e2b8b49d3))
+* Column stacked log curves. ([`4f8c7b6`](https://github.com/RoxarAPI/roxar2json/commit/4f8c7b6a7a754abdd5b57a07f1fde57f78a88a59))
+* Use column stack interval curves. ([`461e48b`](https://github.com/RoxarAPI/roxar2json/commit/461e48b9b167782cfbf2b2be6d92d5d296976956))
+
 ## v0.1.3 (2022-07-13)
 ### Fix
 * Handle non value curves. ([`74c8884`](https://github.com/RoxarAPI/roxar2json/commit/74c88849375b1c1b0f6a18e2c39a35bb6f960aed))
