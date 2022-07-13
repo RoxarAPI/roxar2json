@@ -160,7 +160,6 @@ class TestWellGeoJson(unittest.TestCase):
 
 
 class TestJsonWellLog(unittest.TestCase):
-
     def setUp(self):
         self.log_run = roxar_proxy.LogRun()
 
@@ -200,7 +199,6 @@ class TestJsonWellLog(unittest.TestCase):
     def test_empty_md(self):
         with self.assertRaises(ValueError):
             self.log_run.set_measured_depths([])
-
 
     def test_log_curve(self):
         self.log_run.set_measured_depths([1.0, 100.0])
