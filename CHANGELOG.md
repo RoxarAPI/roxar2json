@@ -2,6 +2,11 @@
 
 <!--next-version-placeholder-->
 
+## v0.1.3 (2022-07-13)
+### Fix
+* Handle non value curves. ([`74c8884`](https://github.com/RoxarAPI/roxar2json/commit/74c88849375b1c1b0f6a18e2c39a35bb6f960aed))
+* **well_log:** Removed interpolation type attribute. ([`276ad96`](https://github.com/RoxarAPI/roxar2json/commit/276ad96d0fb05c9e2859ff78d00b5aca50dd0b93))
+
 ## v0.1.2 (2022-07-13)
 ### Fix
 * Fixed serialization of int32. ([`0591930`](https://github.com/RoxarAPI/roxar2json/commit/05919308e91278bcea57ae7682238aa07e986cff))
