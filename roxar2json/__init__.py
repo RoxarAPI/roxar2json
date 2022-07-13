@@ -87,11 +87,12 @@ def get_log_jsonwelllog(log_run, sample_size=None):
 
 
 def get_interval_logs(log_run, sample_size=None):
-    header = jsonwelllog.create_header(log_run)
+    log_template = {}
+    log_template["header"] = jsonwelllog.create_header(log_run)
+    log_template["metadata_discrete"] = jsonwelllog.create_discrete_metadata(log_run)
     curve_headers = jsonwelllog.create_curves(log_run)
     curves = jsonwelllog.get_log_data(log_run, sample_size)
     md = jsonwelllog.get_mds(log_run, sample_size)
-    metadata_discrete = jsonwelllog.create_discrete_metadata(log_run)
 
     end_md = md[-1]
 
@@ -100,9 +101,7 @@ def get_interval_logs(log_run, sample_size=None):
     for curve_header, curve in zip(curve_headers[1:], curves):
         end_curve = curve[-1]
 
-        log = {}
-        log["header"] = header
-        log["metadata_discrete"] = metadata_discrete
+        log = log_template.copy()
         log["curves"] = [curve_headers[0], curve_header]
 
         # Consolidate intervals
