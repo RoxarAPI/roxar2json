@@ -320,6 +320,14 @@ class TestJsonWellLog(unittest.TestCase):
         self.assertListEqual(md.tolist(), [1, 4])
         self.assertListEqual(values.tolist(), [None, None])
 
+    def test_none_interval(self):
+        self.log_run.set_measured_depths([1, 2, 3, 4])
+
+        curve = self.log_run.log_curves.create_discrete("DiscreteLog")
+
+        with self.assertRaises(ValueError):
+            curve.set_values([None, None, None, None])
+
     def test_interval_mask(self):
         curve = numpy.ma.masked_array(
             [1, 2, 2, 2, -999, -999, 1], [False, False, False, False, True, True, False]
