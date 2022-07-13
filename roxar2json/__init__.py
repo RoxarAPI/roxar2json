@@ -121,7 +121,7 @@ def get_interval_logs(log_run, sample_size=None):
             stripped_curve = numpy.ma.append(stripped_curve, end_curve)
             stripped_md = numpy.ma.append(stripped_md, end_md)
 
-        log["data"] = [stripped_md, stripped_curve]
+        log["data"] = zip(stripped_md, stripped_curve)
         logs.append(log)
 
     return logs

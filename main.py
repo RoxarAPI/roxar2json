@@ -17,6 +17,8 @@ class NumpyEncoder(json.JSONEncoder):
             return o.tolist()
         if isinstance(o, numpy.int32):
             return int(o)
+        if isinstance(o, zip):
+            return [list(a) for a in o]
         return json.JSONEncoder.default(self, o)
 
 

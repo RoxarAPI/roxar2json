@@ -259,12 +259,12 @@ class TestJsonWellLog(unittest.TestCase):
 
         logs = roxar2json.get_interval_logs(self.log_run)
 
-        curve_data = logs[0]["data"]
-        md = curve_data[0]
-        values = curve_data[1]
+        curve_data = zip(*logs[0]["data"])
+        md = next(curve_data)
+        values = next(curve_data)
 
-        self.assertListEqual(md.tolist(), [1, 2, 5, 6, 8])
-        self.assertListEqual(values.tolist(), [1, 2, 1, None, 1])
+        self.assertListEqual(list(md), [1, 2, 5, 6, 8])
+        self.assertListEqual(list(values), [1, 2, 1, numpy.ma.masked, 1])
 
     def test_interval_log_end(self):
         self.log_run.set_measured_depths([1, 2, 3, 4])
@@ -277,12 +277,12 @@ class TestJsonWellLog(unittest.TestCase):
 
         logs = roxar2json.get_interval_logs(self.log_run)
 
-        curve_data = logs[0]["data"]
-        md = curve_data[0]
-        values = curve_data[1]
+        curve_data = zip(*logs[0]["data"])
+        md = next(curve_data)
+        values = next(curve_data)
 
-        self.assertListEqual(md.tolist(), [1, 2, 4])
-        self.assertListEqual(values.tolist(), [1, 2, 2])
+        self.assertListEqual(list(md), [1, 2, 4])
+        self.assertListEqual(list(values), [1, 2, 2])
 
     def test_flat_interval(self):
         self.log_run.set_measured_depths([1, 2, 3, 4])
@@ -295,12 +295,12 @@ class TestJsonWellLog(unittest.TestCase):
 
         logs = roxar2json.get_interval_logs(self.log_run)
 
-        curve_data = logs[0]["data"]
-        md = curve_data[0]
-        values = curve_data[1]
+        curve_data = zip(*logs[0]["data"])
+        md = next(curve_data)
+        values = next(curve_data)
 
-        self.assertListEqual(md.tolist(), [1, 4])
-        self.assertListEqual(values.tolist(), [0, 0])
+        self.assertListEqual(list(md), [1, 4])
+        self.assertListEqual(list(values), [0, 0])
 
     def test_undefined_interval(self):
         self.log_run.set_measured_depths([1, 2, 3, 4])
@@ -313,12 +313,12 @@ class TestJsonWellLog(unittest.TestCase):
 
         logs = roxar2json.get_interval_logs(self.log_run)
 
-        curve_data = logs[0]["data"]
-        md = curve_data[0]
-        values = curve_data[1]
+        curve_data = zip(*logs[0]["data"])
+        md = next(curve_data)
+        values = next(curve_data)
 
-        self.assertListEqual(md.tolist(), [1, 4])
-        self.assertListEqual(values.tolist(), [None, None])
+        self.assertTupleEqual(md, (1, 4))
+        self.assertTupleEqual(values, (numpy.ma.masked, numpy.ma.masked))
 
     def test_none_interval(self):
         self.log_run.set_measured_depths([1, 2, 3, 4])
