@@ -38,14 +38,21 @@ if __name__ == "__main__":
     # Log run arguments
     if PARSER.prog == "logs2jsonwelllog":
         PARSER.add_argument(
-            "-l", "--log_run", type=str, nargs="+", help="List of log runs to export"
-        )
-        PARSER.add_argument(
             "-w",
             "--well",
             type=str,
             nargs="+",
             help="List of wells to export logs from",
+        )
+        PARSER.add_argument(
+            "-l", "--log_run", type=str, nargs="+", help="List of log runs to export"
+        )
+        PARSER.add_argument(
+            "-c",
+            "--curve",
+            type=str,
+            nargs="+",
+            help="List of curves to export",
         )
         PARSER.add_argument("--sample_size", type=float, help="Logs resampling rate")
         PARSER.add_argument(
@@ -86,7 +93,7 @@ if __name__ == "__main__":
                     log_runs = ARGS.log_run
                     sample_size = ARGS.sample_size
                     DATA = roxar2json.get_logs_jsonwelllog(
-                        roxar_project, log_runs, sample_size, ARGS.well, ARGS.spread
+                        roxar_project, log_runs, sample_size, ARGS.well, ARGS.spread, ARGS.curve
                     )
                 elif PARSER.prog == "stratigraphy2json":
                     DATA = roxar2json.get_stratigraphy_json(roxar_project)

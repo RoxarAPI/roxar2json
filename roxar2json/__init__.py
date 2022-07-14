@@ -84,21 +84,21 @@ def get_interval_mask(curve):
     return mask
 
 
-def get_log_jsonwelllog(log_run, sample_size=None):
+def get_log_jsonwelllog(log_run, sample_size=None, curve=None):
     log = {}
     log["header"] = jsonwelllog.create_header(log_run)
-    log["curves"] = jsonwelllog.create_curves(log_run)
-    log["data"] = jsonwelllog.create_data(log_run, sample_size)
-    log["metadata_discrete"] = jsonwelllog.create_discrete_metadata(log_run)
+    log["curves"] = jsonwelllog.create_curves(log_run, curve)
+    log["data"] = jsonwelllog.create_data(log_run, sample_size, curve)
+    log["metadata_discrete"] = jsonwelllog.create_discrete_metadata(log_run, curve)
     return log
 
 
-def get_interval_logs(log_run, sample_size=None):
+def get_interval_logs(log_run, sample_size=None, curve=None):
     log_template = {}
     log_template["header"] = jsonwelllog.create_header(log_run)
-    log_template["metadata_discrete"] = jsonwelllog.create_discrete_metadata(log_run)
-    curve_headers = jsonwelllog.create_curves(log_run)
-    curves = jsonwelllog.get_log_data(log_run, sample_size)
+    log_template["metadata_discrete"] = jsonwelllog.create_discrete_metadata(log_run, curve)
+    curve_headers = jsonwelllog.create_curves(log_run, curve)
+    curves = jsonwelllog.get_log_data(log_run, sample_size, curve)
     md = jsonwelllog.get_mds(log_run, sample_size)
 
     end_md = md[-1]
@@ -128,7 +128,7 @@ def get_interval_logs(log_run, sample_size=None):
 
 
 def get_logs_jsonwelllog(
-    project, selected_log_runs=None, sample_size=None, wells=None, spread_logs=False
+    project, selected_log_runs=None, sample_size=None, wells=None, spread_logs=False, curve=None
 ):
     logs = []
     log_runs = selected_log_runs if selected_log_runs else []
@@ -143,9 +143,9 @@ def get_logs_jsonwelllog(
                 try:
                     log_run = trajectory.log_runs[log_run_name]
                     if spread_logs:
-                        logs += get_interval_logs(log_run, sample_size)
+                        logs += get_interval_logs(log_run, sample_size, curve)
                     else:
-                        logs.append(get_log_jsonwelllog(log_run, sample_size))
+                        logs.append(get_log_jsonwelllog(log_run, sample_size, curve))
                 except KeyError:
                     continue
             # Export logs of only first available trajectory as there is

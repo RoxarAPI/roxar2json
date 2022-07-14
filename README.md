@@ -59,6 +59,12 @@ Spread log curves in order to maximise intervals:
 roxenv python logs2jsonwelllog --spread -- <RMS project path>
 ```
 
+Filter by curve name:
+```sh
+roxenv python logs2jsonwelllog --spread --curve ZONELOG --log_run BLOCKING  -- <RMS project path>
+```
+
+
 
 ### Extract stratigraphy:
 ```sh
@@ -66,9 +72,17 @@ roxenv python stratigraphy2json <RMS project path>
 ```
 
 ## Testing
+
+Test using RoxarAPI:
 ```python
 roxenv python test.py
 ```
+
+Test using mock API:
+```python
+python test.py
+```
+
 ## Contributing
 Commit messages should follow [Conventional commits format](https://www.conventionalcommits.org/en/v1.0.0/)
 
