@@ -3,7 +3,7 @@ import numpy.ma
 from .utilities import generate_color
 from . import geojson, jsonwelllog
 
-__version__ = "0.1.4"
+__version__ = "0.2.0"
 
 
 def get_trajectory_geojson(trajectory):

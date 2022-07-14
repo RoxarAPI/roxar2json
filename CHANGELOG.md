@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v0.2.0 (2022-07-14)
+### Feature
+* Allow filter by curve name ([`5ee1fcd`](https://github.com/RoxarAPI/roxar2json/commit/5ee1fcd12ebf774bac0281897c9d53455368287d))
+
 ## v0.1.4 (2022-07-13)
 ### Fix
 * Fixed json encoding of zipped curves. ([`191646e`](https://github.com/RoxarAPI/roxar2json/commit/191646eb91dbc1d769359684560fd94e2b8b49d3))
