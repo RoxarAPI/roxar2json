@@ -78,30 +78,35 @@ if __name__ == "__main__":
     for path in ARGS.project:
         try:
             with roxar.Project.open(path, readonly=True) as roxar_project:
+
                 if PARSER.prog == "wells2geojson":
-                    DATA = roxar2json.get_wells_geojson(roxar_project)
+                    wells = roxar2json.generate_wells(roxar_project)
+                    DATA = roxar2json.get_wells_geojson(wells)
+
                 elif PARSER.prog == "gridlayer2json":
                     grid_name = ARGS.grid_name
                     property_name = ARGS.property_name
                     DATA = roxar2json.get_grid_layer_data(
                         roxar_project, grid_name, property_name
                     )
+
                 elif PARSER.prog == "faultlines2geojson":
                     horizon_name = ARGS.horizon
                     DATA = roxar2json.get_fault_polygons(roxar_project, horizon_name)
+
                 elif PARSER.prog == "logs2jsonwelllog":
-                    log_runs = ARGS.log_run
-                    sample_size = ARGS.sample_size
+                    wells = roxar2json.generate_wells(roxar_project, ARGS.well)
                     DATA = roxar2json.get_logs_jsonwelllog(
-                        roxar_project,
-                        log_runs,
-                        sample_size,
-                        ARGS.well,
-                        ARGS.spread,
+                        wells,
+                        ARGS.log_run,
                         ARGS.curve,
+                        ARGS.sample_size,
+                        ARGS.spread,
                     )
+
                 elif PARSER.prog == "stratigraphy2json":
                     DATA = roxar2json.get_stratigraphy_json(roxar_project)
+
         except NotImplementedError:
             print("Error: Roxar API needed.", file=sys.stderr)
 
