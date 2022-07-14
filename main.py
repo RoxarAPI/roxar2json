@@ -93,7 +93,12 @@ if __name__ == "__main__":
                     log_runs = ARGS.log_run
                     sample_size = ARGS.sample_size
                     DATA = roxar2json.get_logs_jsonwelllog(
-                        roxar_project, log_runs, sample_size, ARGS.well, ARGS.spread, ARGS.curve
+                        roxar_project,
+                        log_runs,
+                        sample_size,
+                        ARGS.well,
+                        ARGS.spread,
+                        ARGS.curve,
                     )
                 elif PARSER.prog == "stratigraphy2json":
                     DATA = roxar2json.get_stratigraphy_json(roxar_project)

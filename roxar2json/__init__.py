@@ -96,7 +96,9 @@ def get_log_jsonwelllog(log_run, sample_size=None, curve=None):
 def get_interval_logs(log_run, sample_size=None, curve=None):
     log_template = {}
     log_template["header"] = jsonwelllog.create_header(log_run)
-    log_template["metadata_discrete"] = jsonwelllog.create_discrete_metadata(log_run, curve)
+    log_template["metadata_discrete"] = jsonwelllog.create_discrete_metadata(
+        log_run, curve
+    )
     curve_headers = jsonwelllog.create_curves(log_run, curve)
     curves = jsonwelllog.get_log_data(log_run, sample_size, curve)
     md = jsonwelllog.get_mds(log_run, sample_size)
@@ -128,7 +130,12 @@ def get_interval_logs(log_run, sample_size=None, curve=None):
 
 
 def get_logs_jsonwelllog(
-    project, selected_log_runs=None, sample_size=None, wells=None, spread_logs=False, curve=None
+    project,
+    selected_log_runs=None,
+    sample_size=None,
+    wells=None,
+    spread_logs=False,
+    curve=None,
 ):
     logs = []
     log_runs = selected_log_runs if selected_log_runs else []
