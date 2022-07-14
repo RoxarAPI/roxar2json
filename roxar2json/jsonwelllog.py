@@ -32,11 +32,13 @@ def create_curve(name, kind, unit, dimension):
     return curve
 
 
-def create_curves(log_run):
+def create_curves(log_run, curve):
     "Create JSON Well Log curves"
     curves = []
     curves.append(create_curve("MD", "continuous", "m", 1))
     for log_curve in log_run.log_curves:
+        if curve and log_curve.name not in curve:
+            continue
         curves.append(
             create_curve(
                 log_curve.name,
@@ -82,9 +84,11 @@ def get_mds(log_run, sample_size=None):
     return original_mds
 
 
-def get_log_data(log_run, sample_size):
+def get_log_data(log_run, sample_size, curve):
     log_data = []
     for lc in log_run.log_curves:
+        if curve and lc.name not in curve:
+            continue
         if sample_size and sample_size > 0:
             sampled_log_values = _interpolate_log(
                 log_run, lc.get_values(), sample_size, lc.is_discrete
@@ -95,10 +99,10 @@ def get_log_data(log_run, sample_size):
     return log_data
 
 
-def create_data(log_run, sample_size):
+def create_data(log_run, sample_size, curve):
     "Create JSON Well Log data"
     md = get_mds(log_run, sample_size)
-    log_data = get_log_data(log_run, sample_size)
+    log_data = get_log_data(log_run, sample_size, curve)
 
     if md.any() and log_data:
         return list(zip(md, *log_data))
@@ -117,9 +121,11 @@ def _create_log_curve_metadata(discrete_log_curve):
     return metadata
 
 
-def create_discrete_metadata(log_run):
+def create_discrete_metadata(log_run, curve):
     metadata = {}
     for lc in log_run.log_curves:
+        if curve and lc.name not in curve:
+            continue
         # Continuous logs don't have labels
         if not lc.is_discrete:
             continue

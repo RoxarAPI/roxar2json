@@ -44,9 +44,9 @@ def get_well_geojson(well):
     return geojson.create_well_feature(geometry_collection, well.name, color, md)
 
 
-def get_wells_geojson(project):
+def get_wells_geojson(wells):
     geometry = []
-    for well in project.wells:
+    for well in wells:
         geometry.append(get_well_geojson(well))
     return geojson.create_feature_collection(geometry)
 
@@ -84,21 +84,23 @@ def get_interval_mask(curve):
     return mask
 
 
-def get_log_jsonwelllog(log_run, sample_size=None):
+def get_log_jsonwelllog(log_run, sample_size=None, curve=None):
     log = {}
     log["header"] = jsonwelllog.create_header(log_run)
-    log["curves"] = jsonwelllog.create_curves(log_run)
-    log["data"] = jsonwelllog.create_data(log_run, sample_size)
-    log["metadata_discrete"] = jsonwelllog.create_discrete_metadata(log_run)
+    log["curves"] = jsonwelllog.create_curves(log_run, curve)
+    log["data"] = jsonwelllog.create_data(log_run, sample_size, curve)
+    log["metadata_discrete"] = jsonwelllog.create_discrete_metadata(log_run, curve)
     return log
 
 
-def get_interval_logs(log_run, sample_size=None):
+def get_interval_logs(log_run, sample_size=None, selected_curve=None):
     log_template = {}
     log_template["header"] = jsonwelllog.create_header(log_run)
-    log_template["metadata_discrete"] = jsonwelllog.create_discrete_metadata(log_run)
-    curve_headers = jsonwelllog.create_curves(log_run)
-    curves = jsonwelllog.get_log_data(log_run, sample_size)
+    log_template["metadata_discrete"] = jsonwelllog.create_discrete_metadata(
+        log_run, selected_curve
+    )
+    curve_headers = jsonwelllog.create_curves(log_run, selected_curve)
+    curves = jsonwelllog.get_log_data(log_run, sample_size, selected_curve)
     md = jsonwelllog.get_mds(log_run, sample_size)
 
     end_md = md[-1]
@@ -106,8 +108,6 @@ def get_interval_logs(log_run, sample_size=None):
     logs = []
 
     for curve_header, curve in zip(curve_headers[1:], curves):
-        end_curve = curve[-1]
-
         log = log_template.copy()
         log["curves"] = [curve_headers[0], curve_header]
 
@@ -118,7 +118,7 @@ def get_interval_logs(log_run, sample_size=None):
 
         # Capture end interval
         if len(stripped_md) > 0 and end_md != stripped_md[-1]:
-            stripped_curve = numpy.ma.append(stripped_curve, end_curve)
+            stripped_curve = numpy.ma.append(stripped_curve, curve[-1])
             stripped_md = numpy.ma.append(stripped_md, end_md)
 
         log["data"] = zip(stripped_md, stripped_curve)
@@ -128,13 +128,15 @@ def get_interval_logs(log_run, sample_size=None):
 
 
 def get_logs_jsonwelllog(
-    project, selected_log_runs=None, sample_size=None, wells=None, spread_logs=False
+    wells,
+    selected_log_runs=None,
+    curve=None,
+    sample_size=None,
+    spread_logs=False,
 ):
     logs = []
     log_runs = selected_log_runs if selected_log_runs else []
-    for well in project.wells:
-        if wells and well.name not in wells:
-            continue
+    for well in wells:
         for trajectory in well.wellbore.trajectories:
             if not selected_log_runs:
                 for log in trajectory.log_runs:
@@ -143,9 +145,9 @@ def get_logs_jsonwelllog(
                 try:
                     log_run = trajectory.log_runs[log_run_name]
                     if spread_logs:
-                        logs += get_interval_logs(log_run, sample_size)
+                        logs += get_interval_logs(log_run, sample_size, curve)
                     else:
-                        logs.append(get_log_jsonwelllog(log_run, sample_size))
+                        logs.append(get_log_jsonwelllog(log_run, sample_size, curve))
                 except KeyError:
                     continue
             # Export logs of only first available trajectory as there is
@@ -223,3 +225,12 @@ def get_grid_layer_data(project, grid_name, property_name):
                 cells.append(cell)
 
     return cells
+
+
+def generate_wells(project, names=None):
+    "Yield wells from a project."
+
+    for well in project.wells:
+        if names and well.name not in names:
+            continue
+        yield well
